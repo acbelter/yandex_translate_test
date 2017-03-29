@@ -1,0 +1,6 @@
+.DS_Store
+.idea/
+app/app.iml
+build/
+local.properties
+yandex_translate_test.iml

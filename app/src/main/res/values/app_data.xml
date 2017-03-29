@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created by acbelter <acbelter@gmail.com>
+  -->
+
+<resources>
+    <string name="yandex_translation_api_key" translatable="false">
+        trnsl.1.1.20170329T120411Z.7fa61d7216d8b52e.308c66b8407100eae88b93dbc8b99604324c9ac4</string>
+</resources>

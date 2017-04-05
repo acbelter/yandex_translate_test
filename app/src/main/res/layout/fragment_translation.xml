@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created by acbelter <acbelter@gmail.com>
+  -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white"
+                android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:contentInsetLeft="0dp"
+        app:contentInsetStart="0dp"
+        app:titleTextColor="@color/colorMainDark">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/lang_from_text"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:gravity="center"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="@color/colorMainDark"
+                android:textSize="18sp"
+                tools:text="English"/>
+
+            <ImageButton
+                android:id="@+id/btn_swap_langs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/swap_langs"
+                android:padding="4dp"
+                android:src="@drawable/ic_swap_horiz"
+                android:tint="@color/colorMainDark"/>
+
+            <TextView
+                android:id="@+id/lang_to_text"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:gravity="center"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="@color/colorMainDark"
+                android:textSize="18sp"
+                tools:text="Russian"/>
+        </LinearLayout>
+    </android.support.v7.widget.Toolbar>
+
+    <EditText
+        android:id="@+id/original_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:layout_margin="8dp"
+        android:background="@drawable/bg_border"
+        android:gravity="top"
+        android:inputType="none"
+        android:lines="4"
+        android:padding="4dp"
+        tools:text="Original"/>
+
+    <ImageButton
+        android:id="@+id/btn_clear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/original_edit_text"
+        android:layout_marginLeft="8dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/clear_original_text"
+        android:src="@drawable/ic_clear"
+        android:tint="@color/colorDarkGray"
+        android:visibility="invisible"/>
+
+    <ImageButton
+        android:id="@+id/btn_add_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/btn_clear"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/add_to_favorite"
+        android:padding="4dp"
+        android:src="@drawable/ic_bookmark"
+        android:tint="@color/colorDarkGray"/>
+
+    <ScrollView
+        android:id="@+id/translation_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_clear"
+        android:layout_margin="8dp"
+        android:layout_toLeftOf="@id/btn_add_favorite">
+
+        <TextView
+            android:id="@+id/main_translation_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="4"
+            android:overScrollMode="never"
+            android:textColor="@color/colorMainDark"
+            android:textSize="18sp"
+            tools:text="Translation"/>
+    </ScrollView>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/translation_variants_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/translation_container"
+        android:layout_margin="8dp"
+        android:layout_toLeftOf="@id/btn_add_favorite"/>
+</RelativeLayout>

@@ -2,12 +2,14 @@
  * Created by acbelter <acbelter@gmail.com>
  */
 
-package com.acbelter.yatranslatetest;
+package com.acbelter.yatranslatetest.util;
 
 import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.acbelter.yatranslatetest.MainApplication;
 
 import java.io.PrintWriter;
 

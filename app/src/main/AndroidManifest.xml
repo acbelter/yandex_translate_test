@@ -6,6 +6,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.acbelter.yatranslatetest">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
     <application
         android:name=".MainApplication"
         android:allowBackup="true"
@@ -14,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppThemeNoActionBar">
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".view.ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -23,10 +26,10 @@
         </activity>
 
         <activity
-            android:name=".SplashActivity"/>
+            android:name=".view.ui.SplashActivity"/>
 
         <activity
-            android:name=".SelectLangActivity"
+            android:name=".view.ui.SelectLangActivity"
             android:theme="@style/AppTheme"/>
     </application>
 </manifest>

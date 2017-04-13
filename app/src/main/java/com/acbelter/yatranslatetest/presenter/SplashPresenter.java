@@ -1,0 +1,49 @@
+/*
+ * Created by acbelter <acbelter@gmail.com>
+ */
+
+package com.acbelter.yatranslatetest.presenter;
+
+import android.content.Context;
+
+import com.acbelter.yatranslatetest.interactor.Interactor;
+import com.acbelter.yatranslatetest.util.Logger;
+import com.acbelter.yatranslatetest.view.SplashView;
+
+public class SplashPresenter implements Presenter {
+    private int mPresenterId;
+    private Interactor mInteractor;
+
+    public SplashPresenter() {
+    }
+
+    public void setInteractor(Interactor interactor) {
+        mInteractor = interactor;
+    }
+
+    public void startDataInitialization(Context context) {
+        Logger.d("Start data initialization");
+        mInteractor.initData(context);
+    }
+
+    public void finishDataInitialization(Context context,
+                                         SplashView splashView,
+                                         boolean result) {
+        Logger.d("Finish data initialization with result: " + result);
+        if (result) {
+            splashView.hide();
+        } else {
+            startDataInitialization(context);
+        }
+    }
+
+    @Override
+    public void setId(int id) {
+        mPresenterId = id;
+    }
+
+    @Override
+    public int getId() {
+        return mPresenterId;
+    }
+}

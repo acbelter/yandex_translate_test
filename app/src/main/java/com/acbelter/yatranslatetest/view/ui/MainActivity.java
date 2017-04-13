@@ -2,23 +2,31 @@
  * Created by acbelter <acbelter@gmail.com>
  */
 
-package com.acbelter.yatranslatetest;
+package com.acbelter.yatranslatetest.view.ui;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
+import com.acbelter.yatranslatetest.R;
+import com.acbelter.yatranslatetest.presenter.PresentersHubHolderFragment;
+import com.acbelter.yatranslatetest.repository.HistoryStorage;
+import com.acbelter.yatranslatetest.repository.LanguageStorage;
 import com.acbelter.yatranslatetest.util.Utils;
+import com.acbelter.yatranslatetest.view.adapter.MainPagerAdapter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
+    public static final int REQUEST_CODE_SPLASH = 0;
     @BindView(R.id.content_view_pager)
-    protected CustomViewPager mContentViewPager;
+    CustomViewPager mContentViewPager;
     @BindView(R.id.tabs)
-    protected TabLayout mTabs;
+    TabLayout mTabs;
 
     private Drawable mTranslationDrawable;
     private Drawable mTranslationSelectedDrawable;
@@ -30,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        attachPresentersHub();
 
         mTranslationDrawable =
                 Utils.getTintDrawable(this, R.drawable.ic_translate, R.color.colorLightGray);
@@ -47,6 +57,23 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         mTabs.getTabAt(MainPagerAdapter.INDEX_TRANSLATION).setIcon(mTranslationSelectedDrawable);
         mTabs.getTabAt(MainPagerAdapter.INDEX_BOOKMARKS).setIcon(mBookmarksDrawable);
+
+        if (!LanguageStorage.getInstance(this).isLanguagesLoaded() ||
+                !HistoryStorage.getInstance(this).isHistoryLoaded()) {
+            Intent startSplashIntent = new Intent(MainActivity.this, SplashActivity.class);
+            startActivityForResult(startSplashIntent, REQUEST_CODE_SPLASH);
+        }
+    }
+
+    private void attachPresentersHub() {
+        PresentersHubHolderFragment holderFragment =
+                (PresentersHubHolderFragment) getSupportFragmentManager()
+                        .findFragmentByTag(PresentersHubHolderFragment.tag());
+        if (holderFragment == null) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.add(new PresentersHubHolderFragment(), PresentersHubHolderFragment.tag());
+            ft.commit();
+        }
     }
 
     @Override

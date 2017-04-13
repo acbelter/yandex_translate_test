@@ -2,7 +2,7 @@
  * Created by acbelter <acbelter@gmail.com>
  */
 
-package com.acbelter.yatranslatetest;
+package com.acbelter.yatranslatetest.view.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,7 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class TranslationFragment extends Fragment {
+import com.acbelter.yatranslatetest.R;
+import com.acbelter.yatranslatetest.view.TranslationView;
+
+public class TranslationFragment extends Fragment implements TranslationView {
     public static TranslationFragment newInstance() {
         return new TranslationFragment();
     }

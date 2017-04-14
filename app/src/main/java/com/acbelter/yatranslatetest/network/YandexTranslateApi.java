@@ -27,7 +27,8 @@ public class YandexTranslateApi {
     }
 
     // See https://tech.yandex.ru/translate/doc/dg/reference/translate-docpage/
-    public static HttpUrl buildTranslateUrl(String text, String lang, String format)
+    public static HttpUrl buildTranslateUrl(String text, String lang,
+                                            String format, boolean fromAutoLang)
             throws IllegalArgumentException {
         if (!FORMAT_PLAIN.equals(format) || !FORMAT_HTML.equals(format)) {
             throw new IllegalArgumentException("Invalid format");
@@ -47,6 +48,7 @@ public class YandexTranslateApi {
                 .addQueryParameter("text", encodedText)
                 .addQueryParameter("lang", lang)
                 .addQueryParameter("format", format)
+                .addQueryParameter("options", fromAutoLang ? "1" : "0")
                 .build();
     }
 }

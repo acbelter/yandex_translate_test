@@ -4,41 +4,52 @@
 
 package com.acbelter.yatranslatetest.presenter;
 
-import java.util.HashMap;
-import java.util.Map;
+import android.util.SparseArray;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PresentersHub {
     private static PresentersHub sInstance = new PresentersHub();
 
     private AtomicInteger mPresenterIdGenerator;
-    private Map<Integer, Presenter> mIdPresenterMap;
+    private SparseArray<Presenter> mIdPresenterMap;
 
     private PresentersHub() {
         mPresenterIdGenerator = new AtomicInteger();
-        mIdPresenterMap = new HashMap<>();
+        mIdPresenterMap = new SparseArray<>();
     }
 
     public static PresentersHub getInstance() {
         return sInstance;
     }
 
+    /**
+     * Add presenter to hub if it isn't there and return it's id.
+     * If presenter is already in hub, just returns it's id.
+     * @param presenter Presenter to add
+     * @return Presenter id in hub or -1
+     */
     public int addPresenter(Presenter presenter) {
-        for (Map.Entry<Integer, Presenter> entry : mIdPresenterMap.entrySet()) {
-            if (entry.getValue().equals(presenter)) {
-                return entry.getKey();
+        if (presenter == null) {
+            return -1;
+        }
+
+        for (int i = 0; i < mIdPresenterMap.size(); i++) {
+            if (mIdPresenterMap.valueAt(i) == presenter) {
+                return mIdPresenterMap.keyAt(i);
             }
         }
 
         int newPresenterId = mPresenterIdGenerator.getAndIncrement();
-        mIdPresenterMap.put(newPresenterId, presenter);
+        mIdPresenterMap.append(newPresenterId, presenter);
         presenter.setId(newPresenterId);
         return newPresenterId;
     }
 
     public Presenter getPresenterById(int presenterId) {
-        if (mIdPresenterMap.containsKey(presenterId)) {
-            return mIdPresenterMap.get(presenterId);
+        int index = mIdPresenterMap.indexOfKey(presenterId);
+        if (index >= 0) {
+            return mIdPresenterMap.valueAt(index);
         }
         return null;
     }

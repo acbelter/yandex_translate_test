@@ -73,6 +73,7 @@ public class InitDataOperation extends ChronosOperation<Boolean> {
 
         Request request = new Request.Builder()
                 .cacheControl(new CacheControl.Builder().noCache().build())
+                // TODO Determine language code by current locale
                 .url(YandexTranslateApi.buildGetLanguagesUrl("en"))
                 .build();
 

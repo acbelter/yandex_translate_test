@@ -92,4 +92,11 @@ public class SplashActivity extends ChronosAppCompatActivity implements SplashVi
     public void hide() {
         finish();
     }
+
+    @Override
+    public void finish() {
+        super.finish();
+        // Disable animation
+        overridePendingTransition(0, 0);
+    }
 }

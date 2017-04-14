@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,8 +30,6 @@ public class BookmarksFragment extends ChronosSupportFragment implements Bookmar
     TabLayout mTabs;
     @BindView(R.id.btn_clear)
     ImageButton mClearButton;
-    @BindView(R.id.toolbar)
-    Toolbar mToolbar;
     @BindView(R.id.content_view_pager)
     ViewPager mContentViewPager;
 

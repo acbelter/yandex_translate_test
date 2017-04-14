@@ -17,10 +17,6 @@ public class SplashPresenter implements Presenter {
     public SplashPresenter() {
     }
 
-    public void setInteractor(Interactor interactor) {
-        mInteractor = interactor;
-    }
-
     public void startDataInitialization(Context context) {
         Logger.d("Start data initialization");
         mInteractor.initData(context);
@@ -35,6 +31,10 @@ public class SplashPresenter implements Presenter {
         } else {
             startDataInitialization(context);
         }
+    }
+
+    public void setInteractor(Interactor interactor) {
+        mInteractor = interactor;
     }
 
     @Override

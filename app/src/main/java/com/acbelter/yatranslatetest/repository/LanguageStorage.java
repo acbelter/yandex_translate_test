@@ -45,6 +45,20 @@ public class LanguageStorage {
         mLanguages = languages;
     }
 
+    public LanguageModel getLanguageByCode(String code) {
+        if (mLanguages == null || code == null) {
+            return null;
+        }
+
+        for (LanguageModel language : mLanguages) {
+            if (language.code.equals(code)) {
+                return language;
+            }
+        }
+
+        return null;
+    }
+
     public synchronized List<LanguageModel> loadFromDatabase() {
         Cursor cursor = cupboard()
                 .withDatabase(mStorageDbHelper.getReadableDatabase())

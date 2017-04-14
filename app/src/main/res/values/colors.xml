@@ -15,4 +15,5 @@
     <color name="colorTextTranslation">#8D634D</color>
     <color name="colorMainDark">@android:color/black</color>
     <color name="colorMainLight">#66000000</color>
+    <color name="colorLink">#1E88E5</color>
 </resources>

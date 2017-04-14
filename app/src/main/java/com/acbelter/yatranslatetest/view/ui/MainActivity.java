@@ -60,8 +60,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         if (!LanguageStorage.getInstance(this).isLanguagesLoaded() ||
                 !HistoryStorage.getInstance(this).isHistoryLoaded()) {
-            Intent startSplashIntent = new Intent(MainActivity.this, SplashActivity.class);
-            startActivityForResult(startSplashIntent, REQUEST_CODE_SPLASH);
+            Intent intent = new Intent(MainActivity.this, SplashActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            startActivityForResult(intent, REQUEST_CODE_SPLASH);
         }
     }
 

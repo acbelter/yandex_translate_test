@@ -9,8 +9,9 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 public class Pref {
-    public static final String KEY_LANGUAGES_LOADED =
-            "com.acbelter.yatranslatetest.KEY_LANGUAGES_LOADED";
+    public static final String KEY_LANGUAGES_LOADED = "languages_loaded";
+    public static final String KEY_RECENT_LANG_CODE_FROM = "recent_lang_code_from";
+    public static final String KEY_RECENT_LANG_CODE_TO = "recent_lang_code_to";
 
     private static SharedPreferences sPrefs;
 
@@ -24,5 +25,23 @@ public class Pref {
 
     public static void setLanguagesLoaded(boolean loaded) {
         sPrefs.edit().putBoolean(KEY_LANGUAGES_LOADED, loaded).apply();
+    }
+
+    public static String getRecentLangCodeFrom() {
+        // TODO Determine language code by current locale
+        return sPrefs.getString(KEY_RECENT_LANG_CODE_FROM, "en");
+    }
+
+    public void setRecentLangCodeFrom(String code) {
+        sPrefs.edit().putString(KEY_RECENT_LANG_CODE_FROM, code).apply();
+    }
+
+    public static String getRecentLangCodeTo() {
+        // TODO Determine language code by current locale
+        return sPrefs.getString(KEY_RECENT_LANG_CODE_TO, "ru");
+    }
+
+    public void setRecentLangCodeTo(String code) {
+        sPrefs.edit().putString(KEY_RECENT_LANG_CODE_TO, code).apply();
     }
 }

@@ -54,6 +54,9 @@ public class InitDataOperation extends ChronosOperation<Boolean> {
             List<LanguageModel> languages = mLanguageStorage.loadFromDatabase();
             mLanguageStorage.setLanguages(languages);
         } else {
+            Pref.setRecentLangCodeFrom(null);
+            Pref.setRecentLangCodeTo(null);
+
             List<LanguageModel> languages = loadLanguages();
             mLanguageStorage.setLanguages(languages);
             mLanguageStorage.saveToDatabase();

@@ -4,7 +4,7 @@
   -->
 
 <resources>
-    <string name="app_name">YandexTranslateTest</string>
+    <string name="app_name">YaTranslateTest</string>
 
     <!--Translation screen-->
     <string name="select_language">Select</string>

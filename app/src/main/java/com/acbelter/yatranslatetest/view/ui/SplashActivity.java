@@ -81,7 +81,7 @@ public class SplashActivity extends ChronosAppCompatActivity implements SplashVi
     @Override
     public void finish() {
         super.finish();
-        // Disable animation
-        overridePendingTransition(0, 0);
+        // Override activity animation
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 }

@@ -4,6 +4,8 @@
 
 package com.acbelter.yatranslatetest.presenter;
 
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.SparseArray;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -56,5 +58,16 @@ public class PresentersHub {
 
     public void removePresenterById(int presenterId) {
         mIdPresenterMap.remove(presenterId);
+    }
+
+    public static void attach(FragmentManager fragmentManager) {
+        PresentersHubHolderFragment holderFragment =
+                (PresentersHubHolderFragment) fragmentManager
+                        .findFragmentByTag(PresentersHubHolderFragment.tag());
+        if (holderFragment == null) {
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.add(new PresentersHubHolderFragment(), PresentersHubHolderFragment.tag());
+            ft.commit();
+        }
     }
 }

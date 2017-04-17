@@ -27,11 +27,11 @@ import butterknife.ButterKnife;
 
 public class BookmarksFragment extends ChronosSupportFragment implements BookmarksView {
     @BindView(R.id.tabs)
-    TabLayout mTabs;
+    protected TabLayout mTabs;
     @BindView(R.id.btn_clear)
-    ImageButton mClearButton;
+    protected ImageButton mClearButton;
     @BindView(R.id.content_view_pager)
-    ViewPager mContentViewPager;
+    protected ViewPager mContentViewPager;
 
     private PresentersHub mPresentersHub = PresentersHub.getInstance();
 

@@ -7,14 +7,21 @@
     <string name="app_name">YandexTranslateTest</string>
 
     <!--Translation screen-->
+    <string name="select_language">Select</string>
     <string name="swap_langs">Swap languages</string>
     <string name="hint_original">Enter text</string>
     <string name="clear_original_text">Clear original text</string>
     <string name="add_to_favorite">Add to favorite</string>
-    <string name="license_text">Powered by Yandex.Translate\nhttp://translate.yandex.ru/</string>
+    <string name="license_text">Powered by Yandex.Translate</string>
+    <string name="license_url">http://translate.yandex.ru/</string>
 
     <!--Bookmarks screen-->
     <string name="history">History</string>
     <string name="favorite">Favorite</string>
     <string name="clear">Clear</string>
+
+    <!--Select language screen-->
+    <string name="text_language">Language of text</string>
+    <string name="determine_language">Determine language</string>
+    <string name="all_languages">All languages</string>
 </resources>

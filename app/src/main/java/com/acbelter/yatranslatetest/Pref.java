@@ -8,10 +8,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.acbelter.yatranslatetest.model.LanguageModel;
+
 public class Pref {
     public static final String KEY_LANGUAGES_LOADED = "languages_loaded";
     public static final String KEY_RECENT_LANG_CODE_FROM = "recent_lang_code_from";
     public static final String KEY_RECENT_LANG_CODE_TO = "recent_lang_code_to";
+    public static final String KEY_DETERMINE_LANG = "determine_lang";
 
     private static SharedPreferences sPrefs;
 
@@ -28,20 +31,28 @@ public class Pref {
     }
 
     public static String getRecentLangCodeFrom() {
-        // TODO Determine language code by current locale
-        return sPrefs.getString(KEY_RECENT_LANG_CODE_FROM, "en");
+        return sPrefs.getString(KEY_RECENT_LANG_CODE_FROM, null);
     }
 
-    public void setRecentLangCodeFrom(String code) {
+    public static void setRecentLangCodeFrom(LanguageModel language) {
+        String code = language != null ? language.code : null;
         sPrefs.edit().putString(KEY_RECENT_LANG_CODE_FROM, code).apply();
     }
 
     public static String getRecentLangCodeTo() {
-        // TODO Determine language code by current locale
-        return sPrefs.getString(KEY_RECENT_LANG_CODE_TO, "ru");
+        return sPrefs.getString(KEY_RECENT_LANG_CODE_TO, null);
     }
 
-    public void setRecentLangCodeTo(String code) {
+    public static void setRecentLangCodeTo(LanguageModel language) {
+        String code = language != null ? language.code : null;
         sPrefs.edit().putString(KEY_RECENT_LANG_CODE_TO, code).apply();
+    }
+
+    public static boolean isDetermineLang() {
+        return sPrefs.getBoolean(KEY_DETERMINE_LANG, false);
+    }
+
+    public static void setDetermineLang(boolean determine) {
+        sPrefs.edit().putBoolean(KEY_DETERMINE_LANG, determine).apply();
     }
 }

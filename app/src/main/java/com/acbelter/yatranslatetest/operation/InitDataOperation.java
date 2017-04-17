@@ -65,6 +65,13 @@ public class InitDataOperation extends ChronosOperation<Boolean> {
             Pref.setLanguagesLoaded(true);
         }
 
+        try {
+            // Prevents instant screen hiding
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            // Ignore
+        }
+
         return true;
     }
 

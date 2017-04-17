@@ -5,15 +5,12 @@
 package com.acbelter.yatranslatetest.view.ui;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 
-import com.acbelter.yatranslatetest.R;
 import com.acbelter.yatranslatetest.interactor.ChronosInteractor;
 import com.acbelter.yatranslatetest.interactor.Interactor;
 import com.acbelter.yatranslatetest.operation.InitDataOperation;
 import com.acbelter.yatranslatetest.presenter.Presenter;
 import com.acbelter.yatranslatetest.presenter.PresentersHub;
-import com.acbelter.yatranslatetest.presenter.PresentersHubHolderFragment;
 import com.acbelter.yatranslatetest.presenter.SplashPresenter;
 import com.acbelter.yatranslatetest.view.SplashView;
 import com.redmadrobot.chronos.gui.activity.ChronosAppCompatActivity;
@@ -27,9 +24,8 @@ public class SplashActivity extends ChronosAppCompatActivity implements SplashVi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
 
-        attachPresentersHub();
+        PresentersHub.attach(getSupportFragmentManager());
 
         if (savedInstanceState == null) {
             mPresenter = new SplashPresenter();
@@ -47,17 +43,6 @@ public class SplashActivity extends ChronosAppCompatActivity implements SplashVi
         mPresenter.setInteractor(mInteractor);
 
         mPresenter.startDataInitialization(this);
-    }
-
-    private void attachPresentersHub() {
-        PresentersHubHolderFragment holderFragment =
-                (PresentersHubHolderFragment) getSupportFragmentManager()
-                        .findFragmentByTag(PresentersHubHolderFragment.tag());
-        if (holderFragment == null) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(new PresentersHubHolderFragment(), PresentersHubHolderFragment.tag());
-            ft.commit();
-        }
     }
 
     @Override

@@ -14,10 +14,11 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppThemeNoActionBar">
+        android:supportsRtl="true">
 
-        <activity android:name=".view.ui.MainActivity">
+        <activity
+            android:name=".view.ui.MainActivity"
+            android:theme="@style/AppThemeNoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -26,10 +27,11 @@
         </activity>
 
         <activity
-            android:name=".view.ui.SplashActivity"/>
+            android:name=".view.ui.SplashActivity"
+            android:theme="@style/SplashTheme"/>
 
         <activity
             android:name=".view.ui.SelectLangActivity"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppThemeNoActionBar"/>
     </application>
 </manifest>

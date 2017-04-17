@@ -8,11 +8,11 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
 import com.acbelter.yatranslatetest.R;
-import com.acbelter.yatranslatetest.presenter.PresentersHubHolderFragment;
+import com.acbelter.yatranslatetest.RequestConstants;
+import com.acbelter.yatranslatetest.presenter.PresentersHub;
 import com.acbelter.yatranslatetest.repository.HistoryStorage;
 import com.acbelter.yatranslatetest.repository.LanguageStorage;
 import com.acbelter.yatranslatetest.util.Utils;
@@ -22,11 +22,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
-    public static final int REQUEST_CODE_SPLASH = 0;
     @BindView(R.id.content_view_pager)
-    CustomViewPager mContentViewPager;
+    protected CustomViewPager mContentViewPager;
     @BindView(R.id.tabs)
-    TabLayout mTabs;
+    protected TabLayout mTabs;
 
     private Drawable mTranslationDrawable;
     private Drawable mTranslationSelectedDrawable;
@@ -39,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        attachPresentersHub();
+        PresentersHub.attach(getSupportFragmentManager());
 
         mTranslationDrawable =
                 Utils.getTintDrawable(this, R.drawable.ic_translate, R.color.colorLightGray);
@@ -62,18 +61,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 !HistoryStorage.getInstance(this).isHistoryLoaded()) {
             Intent intent = new Intent(MainActivity.this, SplashActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            startActivityForResult(intent, REQUEST_CODE_SPLASH);
-        }
-    }
-
-    private void attachPresentersHub() {
-        PresentersHubHolderFragment holderFragment =
-                (PresentersHubHolderFragment) getSupportFragmentManager()
-                        .findFragmentByTag(PresentersHubHolderFragment.tag());
-        if (holderFragment == null) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(new PresentersHubHolderFragment(), PresentersHubHolderFragment.tag());
-            ft.commit();
+            startActivityForResult(intent, RequestConstants.REQUEST_CODE_SPLASH);
         }
     }
 

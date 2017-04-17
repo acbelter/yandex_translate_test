@@ -4,9 +4,10 @@
 
 package com.acbelter.yatranslatetest.presenter;
 
-public interface Presenter {
+public interface Presenter<V> {
     String KEY_PRESENTER_ID = "presenter_id";
 
+    void present(V view);
     void setId(int id);
     int getId();
 }

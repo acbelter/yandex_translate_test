@@ -4,6 +4,8 @@
 
 package com.acbelter.yatranslatetest.view.ui;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -18,12 +20,14 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.acbelter.yatranslatetest.R;
+import com.acbelter.yatranslatetest.RequestConstants;
 import com.acbelter.yatranslatetest.interactor.ChronosInteractor;
 import com.acbelter.yatranslatetest.model.LanguageModel;
 import com.acbelter.yatranslatetest.presenter.Presenter;
 import com.acbelter.yatranslatetest.presenter.PresentersHub;
 import com.acbelter.yatranslatetest.presenter.TranslationPresenter;
 import com.acbelter.yatranslatetest.repository.LanguageStorage;
+import com.acbelter.yatranslatetest.util.Logger;
 import com.acbelter.yatranslatetest.view.TranslationView;
 import com.redmadrobot.chronos.gui.fragment.ChronosSupportFragment;
 
@@ -33,11 +37,11 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public class TranslationFragment extends ChronosSupportFragment implements TranslationView {
-    @BindView(R.id.lang_from_text)
+    @BindView(R.id.lang_from_label)
     protected TextView mLangFromText;
     @BindView(R.id.btn_swap_langs)
     protected ImageButton mBtnSwapLangs;
-    @BindView(R.id.lang_to_text)
+    @BindView(R.id.lang_to_label)
     protected TextView mLangToText;
     @BindView(R.id.original_edit_text)
     protected EditText mOriginalEditText;
@@ -85,7 +89,7 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     public void onResume() {
         super.onResume();
         mPresenter.setInteractor(new ChronosInteractor(this));
-        mPresenter.initLanguages(this);
+        mPresenter.present(this);
     }
 
     @Override
@@ -113,12 +117,20 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
 
     @Override
     public void setLanguageFrom(LanguageModel language) {
-        mLangFromText.setText(language != null ? language.description : null);
+        if (language != null) {
+            mLangFromText.setText(language.label);
+        } else {
+            mLangFromText.setText(R.string.select_language);
+        }
     }
 
     @Override
     public void setLanguageTo(LanguageModel language) {
-        mLangToText.setText(language != null ? language.description : null);
+        if (language != null) {
+            mLangToText.setText(language.label);
+        } else {
+            mLangToText.setText(R.string.select_language);
+        }
     }
 
     @Override
@@ -127,14 +139,14 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
         mUnbinder.unbind();
     }
 
-    @OnClick(R.id.lang_from_text)
+    @OnClick(R.id.lang_from_label)
     public void onLangFromClicked(View view) {
-
+        mPresenter.startSelectLanguageFrom(this);
     }
 
-    @OnClick(R.id.lang_to_text)
+    @OnClick(R.id.lang_to_label)
     public void onLangToClicked(View view) {
-
+        mPresenter.startSelectLanguageTo(this);
     }
 
     @OnClick(R.id.btn_swap_langs)
@@ -175,6 +187,21 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     @OnClick(R.id.btn_add_favorite)
     public void onAddFavoriteClicked(View view) {
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == RequestConstants.REQUEST_CODE_SELECT_LANG_FROM) {
+                LanguageModel language = data.getParcelableExtra(RequestConstants.KEY_LANG);
+                mPresenter.setLanguageFrom(this, language);
+                Logger.toast(getActivity(), "Select language from: " + language);
+            } else if (requestCode == RequestConstants.REQUEST_CODE_SELECT_LANG_TO) {
+                LanguageModel language = data.getParcelableExtra(RequestConstants.KEY_LANG);
+                mPresenter.setLanguageTo(this, language);
+                Logger.toast(getActivity(), "Select language to: " + language);
+            }
+        }
     }
 
     public static String tag() {

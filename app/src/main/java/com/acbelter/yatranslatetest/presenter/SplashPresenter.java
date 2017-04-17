@@ -10,7 +10,7 @@ import com.acbelter.yatranslatetest.interactor.Interactor;
 import com.acbelter.yatranslatetest.util.Logger;
 import com.acbelter.yatranslatetest.view.SplashView;
 
-public class SplashPresenter implements Presenter {
+public class SplashPresenter implements Presenter<SplashView> {
     private int mPresenterId;
     private Interactor mInteractor;
 
@@ -35,6 +35,11 @@ public class SplashPresenter implements Presenter {
 
     public void setInteractor(Interactor interactor) {
         mInteractor = interactor;
+    }
+
+    @Override
+    public void present(SplashView view) {
+
     }
 
     @Override

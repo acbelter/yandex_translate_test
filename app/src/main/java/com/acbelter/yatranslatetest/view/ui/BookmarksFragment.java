@@ -59,14 +59,14 @@ public class BookmarksFragment extends ChronosSupportFragment implements Bookmar
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         mPresenter.setInteractor(new ChronosInteractor(this));
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onStop() {
+        super.onStop();
         mPresenter.setInteractor(null);
     }
 

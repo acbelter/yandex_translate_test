@@ -8,6 +8,7 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:animateLayoutChanges="true"
                 android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
@@ -107,53 +108,58 @@
         android:src="@drawable/ic_bookmark"
         android:tint="@color/colorDarkGray"/>
 
-    <ScrollView
-        android:id="@+id/translation_container"
+    <TextView
+        android:id="@+id/detected_language_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/btn_clear"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_toLeftOf="@id/btn_add_favorite"
+        android:textColor="@color/colorText"
+        android:textSize="12sp"
+        android:visibility="gone"
+        tools:text="English"/>
+
+    <ScrollView
+        android:id="@+id/translation_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/license_text"
+        android:layout_below="@id/detected_language_text"
         android:layout_margin="8dp"
         android:layout_toLeftOf="@id/btn_add_favorite">
 
         <TextView
-            android:id="@+id/main_translation_text"
+            android:id="@+id/translation_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:focusable="true"
             android:longClickable="true"
             android:maxLines="4"
-            android:overScrollMode="never"
             android:textColor="@color/colorMainDark"
             android:textIsSelectable="true"
             android:textSize="18sp"
             tools:text="Translation"/>
     </ScrollView>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/translation_variants_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/license_text"
-        android:layout_below="@id/translation_container"
-        android:layout_margin="8dp"
-        android:layout_toLeftOf="@id/btn_add_favorite"/>
-
     <TextView
         android:id="@id/license_text"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/license_url"
-        android:gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
         android:paddingTop="4dp"
         android:text="@string/license_text"/>
 
     <TextView
         android:id="@id/license_url"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:autoLink="web"
-        android:gravity="center_horizontal"
         android:linksClickable="true"
         android:paddingBottom="4dp"
         android:text="@string/license_url"

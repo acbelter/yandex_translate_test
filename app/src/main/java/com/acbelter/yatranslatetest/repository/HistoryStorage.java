@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.acbelter.yatranslatetest.model.HistoryItemModel;
+import com.acbelter.yatranslatetest.util.Logger;
 
 import java.util.List;
 
@@ -52,7 +53,9 @@ public class HistoryStorage {
         try {
             QueryResultIterable<HistoryItemModel> iterable =
                     cupboard().withCursor(cursor).iterate(HistoryItemModel.class);
-            return iterable.list(true);
+            List<HistoryItemModel> result = iterable.list(true);
+            Logger.d("Load history from database: " + result.size());
+            return result;
         } finally {
             if (!cursor.isClosed()) {
                 cursor.close();

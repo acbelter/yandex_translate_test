@@ -19,7 +19,7 @@ public class SplashPresenter implements Presenter<SplashView> {
 
     public void startDataInitialization(Context context) {
         Logger.d("Start data initialization");
-        mInteractor.initData(context);
+        mInteractor.startInitData(context);
     }
 
     public void finishDataInitialization(Context context,

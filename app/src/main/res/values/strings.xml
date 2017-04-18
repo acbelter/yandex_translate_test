@@ -14,6 +14,7 @@
     <string name="add_to_favorite">Add to favorite</string>
     <string name="license_text">Powered by Yandex.Translate</string>
     <string name="license_url">http://translate.yandex.ru/</string>
+    <string name="detected_language">Detected language: %1$s</string>
 
     <!--Bookmarks screen-->
     <string name="history">History</string>
@@ -22,6 +23,6 @@
 
     <!--Select language screen-->
     <string name="text_language">Language of text</string>
-    <string name="determine_language">Determine language</string>
+    <string name="detect_language">Detect language</string>
     <string name="all_languages">All languages</string>
 </resources>

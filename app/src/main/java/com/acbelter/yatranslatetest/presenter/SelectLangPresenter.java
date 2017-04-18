@@ -15,13 +15,13 @@ import com.acbelter.yatranslatetest.view.SelectLangView;
 
 public class SelectLangPresenter implements Presenter<SelectLangView> {
     private int mPresenterId;
-    private boolean mDetermineLanguageState;
-    private boolean mDetermineLangUiVisible;
+    private boolean mDetectLanguageState;
+    private boolean mDetectLanguageUiVisible;
     private LanguageModel mSelectedLanguage;
 
     public SelectLangPresenter(LanguageStorage storage, SelectLangMode mode) {
-        mDetermineLanguageState = Pref.isDetermineLang();
-        mDetermineLangUiVisible = mode == SelectLangMode.LANG_FROM;
+        mDetectLanguageState = Pref.isDetectLang();
+        mDetectLanguageUiVisible = mode == SelectLangMode.LANG_FROM;
 
         switch (mode) {
             case LANG_FROM:
@@ -33,9 +33,9 @@ public class SelectLangPresenter implements Presenter<SelectLangView> {
         }
     }
 
-    public void setDetermineLanguageState(boolean state) {
-        mDetermineLanguageState = state;
-        Pref.setDetermineLang(state);
+    public void setDetectLanguageState(boolean state) {
+        mDetectLanguageState = state;
+        Pref.setDetectLang(state);
     }
 
     public void setSelectedLanguage(LanguageModel language) {
@@ -55,8 +55,8 @@ public class SelectLangPresenter implements Presenter<SelectLangView> {
 
     @Override
     public void present(SelectLangView view) {
-        view.setDetermineLanguageState(mDetermineLanguageState);
-        view.setDetermineLangUiVisible(mDetermineLangUiVisible);
+        view.setDetectLanguageState(mDetectLanguageState);
+        view.setDetectLanguageUiVisible(mDetectLanguageUiVisible);
         view.setSelectedLanguage(mSelectedLanguage);
     }
 

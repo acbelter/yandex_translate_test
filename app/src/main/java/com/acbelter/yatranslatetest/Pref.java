@@ -14,7 +14,7 @@ public class Pref {
     public static final String KEY_LANGUAGES_LOADED = "languages_loaded";
     public static final String KEY_RECENT_LANG_CODE_FROM = "recent_lang_code_from";
     public static final String KEY_RECENT_LANG_CODE_TO = "recent_lang_code_to";
-    public static final String KEY_DETERMINE_LANG = "determine_lang";
+    public static final String KEY_DETECT_LANG = "detect_lang";
 
     private static SharedPreferences sPrefs;
 
@@ -48,11 +48,11 @@ public class Pref {
         sPrefs.edit().putString(KEY_RECENT_LANG_CODE_TO, code).apply();
     }
 
-    public static boolean isDetermineLang() {
-        return sPrefs.getBoolean(KEY_DETERMINE_LANG, false);
+    public static boolean isDetectLang() {
+        return sPrefs.getBoolean(KEY_DETECT_LANG, false);
     }
 
-    public static void setDetermineLang(boolean determine) {
-        sPrefs.edit().putBoolean(KEY_DETERMINE_LANG, determine).apply();
+    public static void setDetectLang(boolean detect) {
+        sPrefs.edit().putBoolean(KEY_DETECT_LANG, detect).apply();
     }
 }

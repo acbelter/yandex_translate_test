@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.acbelter.yatranslatetest.model.LanguageModel;
+import com.acbelter.yatranslatetest.util.Logger;
 
 import java.util.List;
 
@@ -66,7 +67,9 @@ public class LanguageStorage {
         try {
             QueryResultIterable<LanguageModel> iterable =
                     cupboard().withCursor(cursor).iterate(LanguageModel.class);
-            return iterable.list(true);
+            List<LanguageModel> result = iterable.list(true);
+            Logger.d("Load languages from database: " + result.size());
+            return result;
         } finally {
             if (!cursor.isClosed()) {
                 cursor.close();

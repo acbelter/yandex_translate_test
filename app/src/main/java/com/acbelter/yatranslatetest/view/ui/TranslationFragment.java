@@ -8,7 +8,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,13 +24,17 @@ import com.acbelter.yatranslatetest.R;
 import com.acbelter.yatranslatetest.RequestConstants;
 import com.acbelter.yatranslatetest.interactor.ChronosInteractor;
 import com.acbelter.yatranslatetest.model.LanguageModel;
+import com.acbelter.yatranslatetest.model.TranslationModel;
+import com.acbelter.yatranslatetest.operation.TranslateOperation;
 import com.acbelter.yatranslatetest.presenter.Presenter;
 import com.acbelter.yatranslatetest.presenter.PresentersHub;
 import com.acbelter.yatranslatetest.presenter.TranslationPresenter;
 import com.acbelter.yatranslatetest.repository.LanguageStorage;
-import com.acbelter.yatranslatetest.util.Logger;
 import com.acbelter.yatranslatetest.view.TranslationView;
 import com.redmadrobot.chronos.gui.fragment.ChronosSupportFragment;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,10 +54,10 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     protected ImageButton mBtnClear;
     @BindView(R.id.btn_add_favorite)
     protected ImageButton mBtnAddFavorite;
-    @BindView(R.id.main_translation_text)
-    protected TextView mMainTranslationText;
-    @BindView(R.id.translation_variants_list)
-    protected RecyclerView mTranslationVariantsList;
+    @BindView(R.id.translation_text)
+    protected TextView mTranslationText;
+    @BindView(R.id.detected_language_text)
+    protected TextView mDetectedLanguageText;
     private Unbinder mUnbinder;
 
     private PresentersHub mPresentersHub = PresentersHub.getInstance();
@@ -86,16 +91,21 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         mPresenter.setInteractor(new ChronosInteractor(this));
-        mPresenter.present(this);
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onStop() {
+        super.onStop();
         mPresenter.setInteractor(null);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mPresenter.present(this);
     }
 
     @Override
@@ -112,6 +122,50 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_translation, container, false);
         mUnbinder = ButterKnife.bind(this, view);
+
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP){
+            // Previous versions are not support ripple effect
+            mLangFromText.setBackgroundResource(0);
+            mLangToText.setBackgroundResource(0);
+            mBtnSwapLangs.setBackgroundResource(0);
+        }
+
+        mOriginalEditText.addTextChangedListener(
+                new TextWatcher() {
+                    private final long DELAY = 500L;
+                    private Timer mTimer = new Timer();
+
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    }
+
+                    @Override
+                    public void afterTextChanged(final Editable s) {
+                        mTimer.cancel();
+                        if (!s.toString().isEmpty()) {
+                            mBtnClear.setVisibility(View.VISIBLE);
+                            mTimer = new Timer();
+                            mTimer.schedule(
+                                    new TimerTask() {
+                                        @Override
+                                        public void run() {
+                                            String text = s.toString().trim();
+                                            if (!text.isEmpty()) {
+                                                mPresenter.startTranslation(s.toString());
+                                            }
+                                        }
+                                    }, DELAY);
+                        } else {
+                            mBtnClear.setVisibility(View.INVISIBLE);
+                            mPresenter.clearTranslation(TranslationFragment.this);
+                        }
+                    }
+                }
+        );
         return view;
     }
 
@@ -130,6 +184,26 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
             mLangToText.setText(language.label);
         } else {
             mLangToText.setText(R.string.select_language);
+        }
+    }
+
+    @Override
+    public void showTranslation(TranslationModel translation) {
+        if (translation != null) {
+            mTranslationText.setText(translation.buildTranslationText());
+            LanguageModel detectedLang = LanguageStorage.getInstance(getContext())
+                    .getLanguageByCode(translation.detectedLangCode);
+            if (detectedLang != null) {
+                mDetectedLanguageText.setText(
+                        getString(R.string.detected_language, detectedLang.label));
+                mDetectedLanguageText.setVisibility(View.VISIBLE);
+            } else {
+                mDetectedLanguageText.setText(null);
+                mDetectedLanguageText.setVisibility(View.GONE);
+            }
+        } else {
+            mTranslationText.setText(null);
+            mDetectedLanguageText.setVisibility(View.GONE);
         }
     }
 
@@ -168,6 +242,7 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
             public void onAnimationEnd(Animation animation) {
                 mSwapRotateClockwise = !mSwapRotateClockwise;
                 mPresenter.swapLanguages(TranslationFragment.this);
+                mPresenter.startTranslation(getOriginalText());
             }
 
             @Override
@@ -179,9 +254,14 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
         mBtnSwapLangs.startAnimation(rotate);
     }
 
+    private String getOriginalText() {
+        return mOriginalEditText.getText().toString();
+    }
+
     @OnClick(R.id.btn_clear)
     public void onClearClicked(View view) {
-
+        mOriginalEditText.setText(null);
+        mBtnClear.setVisibility(View.INVISIBLE);
     }
 
     @OnClick(R.id.btn_add_favorite)
@@ -189,17 +269,23 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
 
     }
 
+    public void onOperationFinished(TranslateOperation.Result result) {
+        TranslationModel translation = !result.getOperation().isCancelled() ? result.getOutput() : null;
+        mPresenter.finishTranslation(this, translation);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mPresenter.setInteractor(new ChronosInteractor(this));
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == RequestConstants.REQUEST_CODE_SELECT_LANG_FROM) {
                 LanguageModel language = data.getParcelableExtra(RequestConstants.KEY_LANG);
                 mPresenter.setLanguageFrom(this, language);
-                Logger.toast(getActivity(), "Select language from: " + language);
+                mPresenter.startTranslation(getOriginalText());
             } else if (requestCode == RequestConstants.REQUEST_CODE_SELECT_LANG_TO) {
                 LanguageModel language = data.getParcelableExtra(RequestConstants.KEY_LANG);
                 mPresenter.setLanguageTo(this, language);
-                Logger.toast(getActivity(), "Select language to: " + language);
+                mPresenter.startTranslation(getOriginalText());
             }
         }
     }

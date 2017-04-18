@@ -8,10 +8,12 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.acbelter.yatranslatetest.Cache;
 import com.acbelter.yatranslatetest.Pref;
 import com.acbelter.yatranslatetest.model.HistoryItemModel;
 import com.acbelter.yatranslatetest.model.LanguageModel;
 import com.acbelter.yatranslatetest.network.NetworkClient;
+import com.acbelter.yatranslatetest.network.Parser;
 import com.acbelter.yatranslatetest.network.YandexTranslateApi;
 import com.acbelter.yatranslatetest.repository.HistoryStorage;
 import com.acbelter.yatranslatetest.repository.LanguageStorage;
@@ -19,13 +21,10 @@ import com.acbelter.yatranslatetest.util.Logger;
 import com.redmadrobot.chronos.ChronosOperation;
 import com.redmadrobot.chronos.ChronosOperationResult;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import okhttp3.CacheControl;
@@ -36,12 +35,10 @@ import okhttp3.Response;
 public class InitDataOperation extends ChronosOperation<Boolean> {
     private LanguageStorage mLanguageStorage;
     private HistoryStorage mHistoryStorage;
-    private File mCacheDir;
 
     public InitDataOperation(Context context) {
         mLanguageStorage = LanguageStorage.getInstance(context);
         mHistoryStorage = HistoryStorage.getInstance(context);
-        mCacheDir = context.getCacheDir();
     }
 
     @Nullable
@@ -52,12 +49,24 @@ public class InitDataOperation extends ChronosOperation<Boolean> {
 
         if (Pref.isLanguagesLoaded()) {
             List<LanguageModel> languages = mLanguageStorage.loadFromDatabase();
+            Collections.sort(languages, new Comparator<LanguageModel>() {
+                @Override
+                public int compare(LanguageModel lang1, LanguageModel lang2) {
+                    return lang1.label.compareToIgnoreCase(lang2.label);
+                }
+            });
             mLanguageStorage.setLanguages(languages);
         } else {
             Pref.setRecentLangCodeFrom(null);
             Pref.setRecentLangCodeTo(null);
 
             List<LanguageModel> languages = loadLanguages();
+            Collections.sort(languages, new Comparator<LanguageModel>() {
+                @Override
+                public int compare(LanguageModel lang1, LanguageModel lang2) {
+                    return lang1.label.compareToIgnoreCase(lang2.label);
+                }
+            });
             mLanguageStorage.setLanguages(languages);
             mLanguageStorage.saveToDatabase();
         }
@@ -79,11 +88,11 @@ public class InitDataOperation extends ChronosOperation<Boolean> {
     }
 
     private List<LanguageModel> loadLanguages() {
-        OkHttpClient client = NetworkClient.provideOkHttpClient(mCacheDir);
+        OkHttpClient client = NetworkClient.provideOkHttpClient(Cache.provideCacheDir());
 
         Request request = new Request.Builder()
                 .cacheControl(new CacheControl.Builder().noCache().build())
-                // TODO Determine language code by current locale
+                // TODO Detect language code by current locale
                 .url(YandexTranslateApi.buildGetLanguagesUrl("en"))
                 .build();
 
@@ -96,23 +105,10 @@ public class InitDataOperation extends ChronosOperation<Boolean> {
             }
 
             String data = response.body().string();
-
-            List<LanguageModel> languages = new ArrayList<>();
-            JSONObject langsObj = new JSONObject(data).getJSONObject("langs");
-            Iterator<String> langsIterator = langsObj.keys();
-            while (langsIterator.hasNext()) {
-                String key = langsIterator.next();
-                String value = langsObj.getString(key);
-                languages.add(new LanguageModel(key, value));
-            }
-
-            return languages;
-        } catch (IOException e) {
+            return Parser.parseLanguages(data);
+        } catch (Exception e) {
             Logger.printStackTrace(e);
-            return null;
-        } catch (JSONException e) {
-            Logger.printStackTrace(e);
-            return null;
+            return new ArrayList<>(0);
         } finally {
             if (response != null) {
                 response.body().close();

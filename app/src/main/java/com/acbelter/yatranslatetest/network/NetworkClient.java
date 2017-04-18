@@ -42,7 +42,7 @@ public class NetworkClient {
                         Logger.d(message);
                     }
                 });
-        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
+        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
         return httpLoggingInterceptor;
     }
 }

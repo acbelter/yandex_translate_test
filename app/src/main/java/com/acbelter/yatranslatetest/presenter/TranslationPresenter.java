@@ -11,6 +11,7 @@ import com.acbelter.yatranslatetest.Pref;
 import com.acbelter.yatranslatetest.RequestConstants;
 import com.acbelter.yatranslatetest.interactor.Interactor;
 import com.acbelter.yatranslatetest.model.LanguageModel;
+import com.acbelter.yatranslatetest.model.TranslationModel;
 import com.acbelter.yatranslatetest.repository.LanguageStorage;
 import com.acbelter.yatranslatetest.view.TranslationView;
 import com.acbelter.yatranslatetest.view.ui.SelectLangActivity;
@@ -24,6 +25,8 @@ public class TranslationPresenter implements Presenter<TranslationView> {
     private LanguageModel mLanguageFrom;
     private LanguageModel mLanguageTo;
 
+    private TranslationModel mCurrentTranslation;
+
     private boolean mIsFirstPresentation;
 
     public TranslationPresenter(LanguageStorage languageStorage) {
@@ -36,7 +39,7 @@ public class TranslationPresenter implements Presenter<TranslationView> {
         String toCode = Pref.getRecentLangCodeTo();
         // No recent language
         if (fromCode == null) {
-            // TODO Determine language code by current locale
+            // TODO Detect language code by current locale
             fromCode = "en";
         }
 
@@ -45,7 +48,7 @@ public class TranslationPresenter implements Presenter<TranslationView> {
 
         // No recent language
         if (toCode == null) {
-            // TODO Determine language code by current locale
+            // TODO Detect language code by current locale
             toCode = "ru";
         }
 
@@ -98,6 +101,24 @@ public class TranslationPresenter implements Presenter<TranslationView> {
         return mLanguageTo;
     }
 
+    public void startTranslation(String text) {
+        if (Pref.isDetectLang()) {
+            mInteractor.startTranslation(text, null, mLanguageTo);
+        } else {
+            mInteractor.startTranslation(text, mLanguageFrom, mLanguageTo);
+        }
+    }
+
+    public void finishTranslation(TranslationView view, TranslationModel translation) {
+        mCurrentTranslation = translation;
+        view.showTranslation(translation);
+    }
+
+    public void clearTranslation(TranslationView view) {
+        mCurrentTranslation = null;
+        view.showTranslation(null);
+    }
+
     public void setInteractor(Interactor interactor) {
         mInteractor = interactor;
     }
@@ -106,9 +127,11 @@ public class TranslationPresenter implements Presenter<TranslationView> {
     public void present(TranslationView view) {
         if (mIsFirstPresentation) {
             initLanguages(view);
+            mIsFirstPresentation = false;
         } else {
             view.setLanguageFrom(mLanguageFrom);
             view.setLanguageTo(mLanguageTo);
+            view.showTranslation(mCurrentTranslation);
         }
     }
 

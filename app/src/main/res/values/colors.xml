@@ -10,9 +10,6 @@
     <color name="colorLightGray">#CBCBCB</color>
     <color name="colorDarkGray">#858E98</color>
     <color name="colorText">#AAAAAA</color>
-    <color name="colorTextPartSpeech">#A37D92</color>
-    <color name="colorTextSynonym">#4B7893</color>
-    <color name="colorTextTranslation">#8D634D</color>
     <color name="colorMainDark">@android:color/black</color>
     <color name="colorMainLight">#66000000</color>
     <color name="colorLink">#1E88E5</color>

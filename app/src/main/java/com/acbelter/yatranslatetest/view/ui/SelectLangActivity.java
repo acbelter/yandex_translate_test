@@ -34,10 +34,10 @@ import butterknife.ButterKnife;
 public class SelectLangActivity extends AppCompatActivity implements SelectLangView {
     @BindView(R.id.toolbar)
     protected Toolbar mToolbar;
-    @BindView(R.id.determine_lang_switch)
-    protected SwitchCompat mDetermineLangSwitch;
-    @BindView(R.id.determine_lang_container)
-    protected LinearLayout mDetermineLangContainer;
+    @BindView(R.id.detect_lang_switch)
+    protected SwitchCompat mDetectLangSwitch;
+    @BindView(R.id.detect_lang_container)
+    protected LinearLayout mDetectLangContainer;
     @BindView(R.id.langs_list)
     protected ListView mLangsList;
 
@@ -63,7 +63,8 @@ public class SelectLangActivity extends AppCompatActivity implements SelectLangV
         Utils.attachToolbar(this, mToolbar, true);
 
         if (savedInstanceState == null) {
-            mSelectLangMode = SelectLangMode.valueOf(getIntent().getStringExtra(RequestConstants.KEY_SELECT_LANG_MODE));
+            mSelectLangMode = SelectLangMode.valueOf(
+                    getIntent().getStringExtra(RequestConstants.KEY_SELECT_LANG_MODE));
             mPresenter = new SelectLangPresenter(LanguageStorage.getInstance(this), mSelectLangMode);
             mPresentersHub.addPresenter(mPresenter);
         } else {
@@ -76,10 +77,10 @@ public class SelectLangActivity extends AppCompatActivity implements SelectLangV
             }
         }
 
-        mDetermineLangSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mDetectLangSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mPresenter.setDetermineLanguageState(isChecked);
+                mPresenter.setDetectLanguageState(isChecked);
             }
         });
 
@@ -125,18 +126,17 @@ public class SelectLangActivity extends AppCompatActivity implements SelectLangV
                 finish();
                 break;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void setDetermineLangUiVisible(boolean visible) {
-        mDetermineLangContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
+    public void setDetectLanguageState(boolean state) {
+        mDetectLangSwitch.setChecked(state);
     }
 
     @Override
-    public void setDetermineLanguageState(boolean state) {
-        mDetermineLangSwitch.setChecked(state);
+    public void setDetectLanguageUiVisible(boolean visible) {
+        mDetectLangContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     @Override

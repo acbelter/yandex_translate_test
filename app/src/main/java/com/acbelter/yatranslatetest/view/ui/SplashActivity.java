@@ -46,14 +46,14 @@ public class SplashActivity extends ChronosAppCompatActivity implements SplashVi
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         mPresenter.setInteractor(mInteractor);
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onStop() {
+        super.onStop();
         mPresenter.setInteractor(null);
     }
 

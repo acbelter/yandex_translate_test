@@ -5,9 +5,9 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
@@ -18,7 +18,7 @@
         app:titleTextColor="@color/colorMainDark"/>
 
     <LinearLayout
-        android:id="@+id/determine_lang_container"
+        android:id="@+id/detect_lang_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -30,10 +30,10 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
             android:layout_weight="1"
-            android:text="@string/determine_language"/>
+            android:text="@string/detect_language"/>
 
         <android.support.v7.widget.SwitchCompat
-            android:id="@+id/determine_lang_switch"
+            android:id="@+id/detect_lang_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </LinearLayout>
@@ -49,7 +49,8 @@
         android:padding="8dp"
         android:text="@string/all_languages"
         android:textAllCaps="true"
-        android:textColor="@color/colorText"/>
+        android:textColor="@color/colorText"
+        android:textSize="12sp"/>
 
     <View
         android:layout_width="match_parent"

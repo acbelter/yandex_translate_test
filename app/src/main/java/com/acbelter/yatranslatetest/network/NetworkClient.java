@@ -7,14 +7,28 @@ package com.acbelter.yatranslatetest.network;
 import com.acbelter.yatranslatetest.util.Logger;
 
 import java.io.File;
+import java.io.IOException;
 
 import okhttp3.Cache;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 public class NetworkClient {
+    private static final Interceptor REWRITE_CACHE_CONTROL_INTERCEPTOR = new Interceptor() {
+        @Override
+        public Response intercept(Interceptor.Chain chain) throws IOException {
+            Response originalResponse = chain.proceed(chain.request());
+            return originalResponse.newBuilder()
+                    .header("Cache-Control", "max-age=" + 60 * 60 * 24) // 1 day
+                    .build();
+        }
+    };
+
     public static OkHttpClient provideOkHttpClient(File cacheDir) {
         return new OkHttpClient.Builder()
+                .addNetworkInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR)
                 .addInterceptor(provideHttpLoggingInterceptor())
                 .cache(provideCache(cacheDir))
                 .build();

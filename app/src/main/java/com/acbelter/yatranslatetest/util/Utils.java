@@ -6,9 +6,8 @@ package com.acbelter.yatranslatetest.util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.ActionBar;
@@ -16,6 +15,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
+
+import com.acbelter.yatranslatetest.R;
 
 public final class Utils {
     private Utils() {}
@@ -53,18 +55,18 @@ public final class Utils {
         }
     }
 
+    public static void tintIndeterminateProgressBar(ProgressBar progressBar) {
+        progressBar.getIndeterminateDrawable().setColorFilter(
+                ContextCompat.getColor(progressBar.getContext(), R.color.colorAccent),
+                PorterDuff.Mode.SRC_IN);
+    }
+
+
     public static void attachToolbar(Activity activity, Toolbar toolbar, boolean showBackButton) {
         ((AppCompatActivity) activity).setSupportActionBar(toolbar);
         ActionBar actionBar = ((AppCompatActivity) activity).getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(showBackButton);
         }
-    }
-
-    public static boolean hasNetworkConnection(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnected();
     }
 }

@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.acbelter.yatranslatetest.Cache;
+import com.acbelter.yatranslatetest.MainApplication;
 import com.acbelter.yatranslatetest.model.LanguageModel;
 import com.acbelter.yatranslatetest.model.TranslationModel;
 import com.acbelter.yatranslatetest.network.NetworkClient;
@@ -19,9 +20,7 @@ import com.redmadrobot.chronos.ChronosOperation;
 import com.redmadrobot.chronos.ChronosOperationResult;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
-import okhttp3.CacheControl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -46,12 +45,19 @@ public class TranslateOperation extends ChronosOperation<TranslationModel> {
             return null;
         }
 
+        if (MainApplication.SIMULATE_SLOW_NETWORK) {
+            try {
+                Thread.sleep(MainApplication.SLOW_NETWORK_DELAY);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+        }
+
         OkHttpClient client = NetworkClient.provideOkHttpClient(Cache.provideCacheDir());
 
         Response response = null;
         try {
             Request request = new Request.Builder()
-                    .cacheControl(new CacheControl.Builder().maxAge(7, TimeUnit.DAYS).build())
                     .url(YandexTranslateApi.buildTranslateUrl(
                             mText, mLangFromCode, mLangToCode, YandexTranslateApi.FORMAT_PLAIN))
                     .build();
@@ -62,11 +68,13 @@ public class TranslateOperation extends ChronosOperation<TranslationModel> {
                         + response.body().string());
             }
 
+            Logger.d("Translation response from cache: " + (response.cacheResponse() != null));
+
             String data = response.body().string();
             Logger.d("Translation: " + data);
             TranslationModel translation = Parser.parseTranslation(data);
-            if (translation.code != 200) {
-
+            if (translation.code == 200) {
+                return translation;
             }
 
             return null;

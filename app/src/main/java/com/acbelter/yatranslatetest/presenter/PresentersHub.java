@@ -8,21 +8,32 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.SparseArray;
 
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PresentersHub {
     private static PresentersHub sInstance = new PresentersHub();
 
+    private UUID mHubId;
     private AtomicInteger mPresenterIdGenerator;
     private SparseArray<Presenter> mIdPresenterMap;
 
     private PresentersHub() {
+        mHubId = UUID.randomUUID();
         mPresenterIdGenerator = new AtomicInteger();
         mIdPresenterMap = new SparseArray<>();
     }
 
     public static PresentersHub getInstance() {
         return sInstance;
+    }
+
+    public UUID getHubId() {
+        return mHubId;
+    }
+
+    public PresenterId getIdForPresenter(Presenter presenter) {
+        return new PresenterId(mHubId, presenter.getId());
     }
 
     /**
@@ -48,8 +59,12 @@ public class PresentersHub {
         return newPresenterId;
     }
 
-    public Presenter getPresenterById(int presenterId) {
-        int index = mIdPresenterMap.indexOfKey(presenterId);
+    public Presenter getPresenterById(PresenterId id) {
+        if (!mHubId.equals(id.getHubId())) {
+            return null;
+        }
+
+        int index = mIdPresenterMap.indexOfKey(id.getId());
         if (index >= 0) {
             return mIdPresenterMap.valueAt(index);
         }

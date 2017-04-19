@@ -94,17 +94,26 @@
         android:tint="@color/colorDarkGray"
         android:visibility="invisible"/>
 
+    <ProgressBar
+        android:id="@+id/translation_progress"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/original_edit_text"
+        android:layout_marginRight="8dp"
+        android:indeterminate="true"
+        android:visibility="invisible"/>
+
     <ImageButton
         android:id="@+id/btn_add_favorite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_below="@id/btn_clear"
-        android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
         android:contentDescription="@string/add_to_favorite"
-        android:padding="4dp"
+        android:padding="8dp"
         android:src="@drawable/ic_bookmark"
         android:tint="@color/colorDarkGray"/>
 

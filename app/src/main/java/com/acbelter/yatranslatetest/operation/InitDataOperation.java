@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.acbelter.yatranslatetest.Cache;
+import com.acbelter.yatranslatetest.MainApplication;
 import com.acbelter.yatranslatetest.Pref;
 import com.acbelter.yatranslatetest.model.HistoryItemModel;
 import com.acbelter.yatranslatetest.model.LanguageModel;
@@ -44,6 +45,14 @@ public class InitDataOperation extends ChronosOperation<Boolean> {
     @Nullable
     @Override
     public Boolean run() {
+        if (MainApplication.SIMULATE_SLOW_NETWORK) {
+            try {
+                Thread.sleep(MainApplication.SLOW_NETWORK_DELAY);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+        }
+
         List<HistoryItemModel> history = mHistoryStorage.loadFromDatabase();
         mHistoryStorage.setHistory(history);
 

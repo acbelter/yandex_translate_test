@@ -13,4 +13,5 @@ public interface Interactor {
     void startTranslation(String text,
                           LanguageModel langFrom,
                           LanguageModel langTo);
+    void cancelTranslation();
 }

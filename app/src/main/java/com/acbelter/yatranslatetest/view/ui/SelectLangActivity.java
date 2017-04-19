@@ -20,6 +20,7 @@ import com.acbelter.yatranslatetest.R;
 import com.acbelter.yatranslatetest.RequestConstants;
 import com.acbelter.yatranslatetest.model.LanguageModel;
 import com.acbelter.yatranslatetest.presenter.Presenter;
+import com.acbelter.yatranslatetest.presenter.PresenterId;
 import com.acbelter.yatranslatetest.presenter.PresentersHub;
 import com.acbelter.yatranslatetest.presenter.SelectLangMode;
 import com.acbelter.yatranslatetest.presenter.SelectLangPresenter;
@@ -68,9 +69,9 @@ public class SelectLangActivity extends AppCompatActivity implements SelectLangV
             mPresenter = new SelectLangPresenter(LanguageStorage.getInstance(this), mSelectLangMode);
             mPresentersHub.addPresenter(mPresenter);
         } else {
-            int presenterId = savedInstanceState.getInt(Presenter.KEY_PRESENTER_ID);
+            PresenterId id = savedInstanceState.getParcelable(Presenter.KEY_PRESENTER_ID);
             mSelectLangMode = SelectLangMode.valueOf(savedInstanceState.getString("select_lang_mode"));
-            mPresenter = (SelectLangPresenter) mPresentersHub.getPresenterById(presenterId);
+            mPresenter = (SelectLangPresenter) mPresentersHub.getPresenterById(id);
             if (mPresenter == null) {
                 mPresenter = new SelectLangPresenter(LanguageStorage.getInstance(this), mSelectLangMode);
                 mPresentersHub.addPresenter(mPresenter);
@@ -115,7 +116,8 @@ public class SelectLangActivity extends AppCompatActivity implements SelectLangV
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(Presenter.KEY_PRESENTER_ID, mPresenter.getId());
+        outState.putParcelable(Presenter.KEY_PRESENTER_ID,
+                mPresentersHub.getIdForPresenter(mPresenter));
         outState.putString("select_lang_mode", mSelectLangMode.name());
     }
 

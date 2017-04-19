@@ -9,6 +9,8 @@ import android.app.Application;
 public class MainApplication extends Application {
     public static final String TAG = "YATEST";
     public static final boolean DEBUG = true;
+    public static final boolean SIMULATE_SLOW_NETWORK = false;
+    public static final long SLOW_NETWORK_DELAY = 3000L;
 
     @Override
     public void onCreate() {

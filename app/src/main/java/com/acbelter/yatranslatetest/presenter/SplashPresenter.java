@@ -7,6 +7,8 @@ package com.acbelter.yatranslatetest.presenter;
 import android.content.Context;
 
 import com.acbelter.yatranslatetest.interactor.Interactor;
+import com.acbelter.yatranslatetest.repository.HistoryStorage;
+import com.acbelter.yatranslatetest.repository.LanguageStorage;
 import com.acbelter.yatranslatetest.util.Logger;
 import com.acbelter.yatranslatetest.view.SplashView;
 
@@ -17,9 +19,14 @@ public class SplashPresenter implements Presenter<SplashView> {
     public SplashPresenter() {
     }
 
-    public void startDataInitialization(Context context) {
+    public void startDataInitialization(Context context, SplashView splashView) {
         Logger.d("Start data initialization");
-        mInteractor.startInitData(context);
+        if (!LanguageStorage.getInstance(context).isLanguagesLoaded() ||
+                !HistoryStorage.getInstance(context).isHistoryLoaded()) {
+            mInteractor.startInitData(context);
+        } else {
+            splashView.hide();
+        }
     }
 
     public void finishDataInitialization(Context context,
@@ -29,7 +36,7 @@ public class SplashPresenter implements Presenter<SplashView> {
         if (result) {
             splashView.hide();
         } else {
-            startDataInitialization(context);
+            startDataInitialization(context, splashView);
         }
     }
 

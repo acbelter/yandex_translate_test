@@ -7,9 +7,9 @@ package com.acbelter.yatranslatetest.view.ui;
 import android.os.Bundle;
 
 import com.acbelter.yatranslatetest.interactor.ChronosInteractor;
-import com.acbelter.yatranslatetest.interactor.Interactor;
 import com.acbelter.yatranslatetest.operation.InitDataOperation;
 import com.acbelter.yatranslatetest.presenter.Presenter;
+import com.acbelter.yatranslatetest.presenter.PresenterId;
 import com.acbelter.yatranslatetest.presenter.PresentersHub;
 import com.acbelter.yatranslatetest.presenter.SplashPresenter;
 import com.acbelter.yatranslatetest.view.SplashView;
@@ -19,7 +19,6 @@ public class SplashActivity extends ChronosAppCompatActivity implements SplashVi
     private PresentersHub mPresentersHub = PresentersHub.getInstance();
 
     private SplashPresenter mPresenter;
-    private Interactor mInteractor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,24 +30,25 @@ public class SplashActivity extends ChronosAppCompatActivity implements SplashVi
             mPresenter = new SplashPresenter();
             mPresentersHub.addPresenter(mPresenter);
         } else {
-            int presenterId = savedInstanceState.getInt(Presenter.KEY_PRESENTER_ID);
-            mPresenter = (SplashPresenter) mPresentersHub.getPresenterById(presenterId);
+            PresenterId id = savedInstanceState.getParcelable(Presenter.KEY_PRESENTER_ID);
+            mPresenter = (SplashPresenter) mPresentersHub.getPresenterById(id);
             if (mPresenter == null) {
                 mPresenter = new SplashPresenter();
                 mPresentersHub.addPresenter(mPresenter);
             }
         }
-
-        mInteractor = new ChronosInteractor(this);
-        mPresenter.setInteractor(mInteractor);
-
-        mPresenter.startDataInitialization(this);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        mPresenter.setInteractor(mInteractor);
+        mPresenter.setInteractor(new ChronosInteractor(this));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mPresenter.startDataInitialization(this, this);
     }
 
     @Override
@@ -66,7 +66,8 @@ public class SplashActivity extends ChronosAppCompatActivity implements SplashVi
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(Presenter.KEY_PRESENTER_ID, mPresenter.getId());
+        outState.putParcelable(Presenter.KEY_PRESENTER_ID,
+                mPresentersHub.getIdForPresenter(mPresenter));
     }
 
     public void onOperationFinished(InitDataOperation.Result result) {

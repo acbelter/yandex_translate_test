@@ -17,6 +17,7 @@ import com.acbelter.yatranslatetest.R;
 import com.acbelter.yatranslatetest.interactor.ChronosInteractor;
 import com.acbelter.yatranslatetest.presenter.BookmarksPresenter;
 import com.acbelter.yatranslatetest.presenter.Presenter;
+import com.acbelter.yatranslatetest.presenter.PresenterId;
 import com.acbelter.yatranslatetest.presenter.PresentersHub;
 import com.acbelter.yatranslatetest.view.BookmarksView;
 import com.acbelter.yatranslatetest.view.adapter.BookmarksPagerAdapter;
@@ -49,8 +50,8 @@ public class BookmarksFragment extends ChronosSupportFragment implements Bookmar
             mPresenter = new BookmarksPresenter();
             mPresentersHub.addPresenter(mPresenter);
         } else {
-            int presenterId = savedInstanceState.getInt(Presenter.KEY_PRESENTER_ID);
-            mPresenter = (BookmarksPresenter) mPresentersHub.getPresenterById(presenterId);
+            PresenterId id = savedInstanceState.getParcelable(Presenter.KEY_PRESENTER_ID);
+            mPresenter = (BookmarksPresenter) mPresentersHub.getPresenterById(id);
             if (mPresenter == null) {
                 mPresenter = new BookmarksPresenter();
                 mPresentersHub.addPresenter(mPresenter);
@@ -73,7 +74,8 @@ public class BookmarksFragment extends ChronosSupportFragment implements Bookmar
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(Presenter.KEY_PRESENTER_ID, mPresenter.getId());
+        outState.putParcelable(Presenter.KEY_PRESENTER_ID,
+                mPresentersHub.getIdForPresenter(mPresenter));
     }
 
     @Nullable

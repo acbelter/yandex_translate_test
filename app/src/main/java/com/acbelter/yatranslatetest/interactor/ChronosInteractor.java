@@ -29,9 +29,14 @@ public class ChronosInteractor implements Interactor {
                                  LanguageModel langFrom,
                                  LanguageModel langTo) {
         // Cancel previous translation operations
-        mChronosConnectorWrapper.cancelOperation(TranslateOperation.class.getSimpleName());
+        cancelTranslation();
         mChronosConnectorWrapper.runOperation(
                 new TranslateOperation(text, langFrom, langTo),
                 TranslateOperation.class.getSimpleName());
+    }
+
+    @Override
+    public void cancelTranslation() {
+        mChronosConnectorWrapper.cancelOperation(TranslateOperation.class.getSimpleName());
     }
 }

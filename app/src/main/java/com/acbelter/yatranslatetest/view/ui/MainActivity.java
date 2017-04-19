@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.view.WindowManager;
 
 import com.acbelter.yatranslatetest.R;
 import com.acbelter.yatranslatetest.RequestConstants;
@@ -39,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         ButterKnife.bind(this);
 
         PresentersHub.attach(getSupportFragmentManager());
+
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         mTranslationDrawable =
                 Utils.getTintDrawable(this, R.drawable.ic_translate, R.color.colorLightGray);

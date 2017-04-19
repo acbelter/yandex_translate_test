@@ -6,9 +6,13 @@ package com.acbelter.yatranslatetest.view.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +22,7 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.acbelter.yatranslatetest.R;
@@ -27,9 +32,12 @@ import com.acbelter.yatranslatetest.model.LanguageModel;
 import com.acbelter.yatranslatetest.model.TranslationModel;
 import com.acbelter.yatranslatetest.operation.TranslateOperation;
 import com.acbelter.yatranslatetest.presenter.Presenter;
+import com.acbelter.yatranslatetest.presenter.PresenterId;
 import com.acbelter.yatranslatetest.presenter.PresentersHub;
 import com.acbelter.yatranslatetest.presenter.TranslationPresenter;
 import com.acbelter.yatranslatetest.repository.LanguageStorage;
+import com.acbelter.yatranslatetest.util.Logger;
+import com.acbelter.yatranslatetest.util.Utils;
 import com.acbelter.yatranslatetest.view.TranslationView;
 import com.redmadrobot.chronos.gui.fragment.ChronosSupportFragment;
 
@@ -58,6 +66,8 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     protected TextView mTranslationText;
     @BindView(R.id.detected_language_text)
     protected TextView mDetectedLanguageText;
+    @BindView(R.id.translation_progress)
+    protected ProgressBar mTranslationProgress;
     private Unbinder mUnbinder;
 
     private PresentersHub mPresentersHub = PresentersHub.getInstance();
@@ -65,6 +75,8 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     private TranslationPresenter mPresenter;
     // Rotate swap button clockwise or not
     private boolean mSwapRotateClockwise = true;
+
+    private Handler mUiHandler;
 
     public static TranslationFragment newInstance() {
         return new TranslationFragment();
@@ -74,13 +86,15 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mUiHandler = new Handler(Looper.getMainLooper());
+
         LanguageStorage languageStorage = LanguageStorage.getInstance(getContext());
         if (savedInstanceState == null) {
             mPresenter = new TranslationPresenter(languageStorage);
             mPresentersHub.addPresenter(mPresenter);
         } else {
-            int presenterId = savedInstanceState.getInt(Presenter.KEY_PRESENTER_ID);
-            mPresenter = (TranslationPresenter) mPresentersHub.getPresenterById(presenterId);
+            PresenterId id = savedInstanceState.getParcelable(Presenter.KEY_PRESENTER_ID);
+            mPresenter = (TranslationPresenter) mPresentersHub.getPresenterById(id);
             if (mPresenter == null) {
                 mPresenter = new TranslationPresenter(languageStorage);
                 mPresentersHub.addPresenter(mPresenter);
@@ -111,7 +125,8 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(Presenter.KEY_PRESENTER_ID, mPresenter.getId());
+        outState.putParcelable(Presenter.KEY_PRESENTER_ID,
+                mPresentersHub.getIdForPresenter(mPresenter));
         outState.putBoolean("swap_rotate_clockwise", mSwapRotateClockwise);
     }
 
@@ -123,7 +138,9 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
         View view = inflater.inflate(R.layout.fragment_translation, container, false);
         mUnbinder = ButterKnife.bind(this, view);
 
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP){
+        Utils.tintIndeterminateProgressBar(mTranslationProgress);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             // Previous versions are not support ripple effect
             mLangFromText.setBackgroundResource(0);
             mLangToText.setBackgroundResource(0);
@@ -146,17 +163,20 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
                     @Override
                     public void afterTextChanged(final Editable s) {
                         mTimer.cancel();
-                        if (!s.toString().isEmpty()) {
+                        final String text = s.toString().trim();
+                        if (!TextUtils.isEmpty(text)) {
                             mBtnClear.setVisibility(View.VISIBLE);
                             mTimer = new Timer();
                             mTimer.schedule(
                                     new TimerTask() {
                                         @Override
                                         public void run() {
-                                            String text = s.toString().trim();
-                                            if (!text.isEmpty()) {
-                                                mPresenter.startTranslation(s.toString());
-                                            }
+                                            mUiHandler.post(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    mPresenter.startTranslation(TranslationFragment.this, text);
+                                                }
+                                            });
                                         }
                                     }, DELAY);
                         } else {
@@ -167,6 +187,11 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
                 }
         );
         return view;
+    }
+
+    @Override
+    public String getOriginalText() {
+        return mOriginalEditText.getText().toString();
     }
 
     @Override
@@ -188,7 +213,16 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     }
 
     @Override
+    public void showTranslationProcess() {
+        mTranslationText.setText(null);
+        mDetectedLanguageText.setText(null);
+        mDetectedLanguageText.setVisibility(View.GONE);
+        mTranslationProgress.setVisibility(View.VISIBLE);
+    }
+
+    @Override
     public void showTranslation(TranslationModel translation) {
+        mTranslationProgress.setVisibility(View.INVISIBLE);
         if (translation != null) {
             mTranslationText.setText(translation.buildTranslationText());
             LanguageModel detectedLang = LanguageStorage.getInstance(getContext())
@@ -203,6 +237,7 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
             }
         } else {
             mTranslationText.setText(null);
+            mDetectedLanguageText.setText(null);
             mDetectedLanguageText.setVisibility(View.GONE);
         }
     }
@@ -242,7 +277,7 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
             public void onAnimationEnd(Animation animation) {
                 mSwapRotateClockwise = !mSwapRotateClockwise;
                 mPresenter.swapLanguages(TranslationFragment.this);
-                mPresenter.startTranslation(getOriginalText());
+                mPresenter.startTranslation(TranslationFragment.this, getOriginalText());
             }
 
             @Override
@@ -254,12 +289,9 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
         mBtnSwapLangs.startAnimation(rotate);
     }
 
-    private String getOriginalText() {
-        return mOriginalEditText.getText().toString();
-    }
-
     @OnClick(R.id.btn_clear)
     public void onClearClicked(View view) {
+        mPresenter.cancelTranslation();
         mOriginalEditText.setText(null);
         mBtnClear.setVisibility(View.INVISIBLE);
     }
@@ -270,6 +302,7 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     }
 
     public void onOperationFinished(TranslateOperation.Result result) {
+        Logger.d("Translation operation is finished");
         TranslationModel translation = !result.getOperation().isCancelled() ? result.getOutput() : null;
         mPresenter.finishTranslation(this, translation);
     }
@@ -281,11 +314,11 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
             if (requestCode == RequestConstants.REQUEST_CODE_SELECT_LANG_FROM) {
                 LanguageModel language = data.getParcelableExtra(RequestConstants.KEY_LANG);
                 mPresenter.setLanguageFrom(this, language);
-                mPresenter.startTranslation(getOriginalText());
+                mPresenter.startTranslation(this, getOriginalText());
             } else if (requestCode == RequestConstants.REQUEST_CODE_SELECT_LANG_TO) {
                 LanguageModel language = data.getParcelableExtra(RequestConstants.KEY_LANG);
                 mPresenter.setLanguageTo(this, language);
-                mPresenter.startTranslation(getOriginalText());
+                mPresenter.startTranslation(this, getOriginalText());
             }
         }
     }

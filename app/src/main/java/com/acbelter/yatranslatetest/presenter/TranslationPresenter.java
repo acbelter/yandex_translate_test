@@ -101,12 +101,24 @@ public class TranslationPresenter implements Presenter<TranslationView> {
         return mLanguageTo;
     }
 
-    public void startTranslation(String text) {
+    public void startTranslation(TranslationView view, String text) {
+        if (mInteractor == null) {
+            return;
+        }
+
+        clearTranslation(view);
+
         if (Pref.isDetectLang()) {
             mInteractor.startTranslation(text, null, mLanguageTo);
         } else {
             mInteractor.startTranslation(text, mLanguageFrom, mLanguageTo);
         }
+
+        view.showTranslationProcess();
+    }
+
+    public void cancelTranslation() {
+        mInteractor.cancelTranslation();
     }
 
     public void finishTranslation(TranslationView view, TranslationModel translation) {
@@ -131,7 +143,11 @@ public class TranslationPresenter implements Presenter<TranslationView> {
         } else {
             view.setLanguageFrom(mLanguageFrom);
             view.setLanguageTo(mLanguageTo);
-            view.showTranslation(mCurrentTranslation);
+            if (mCurrentTranslation != null) {
+                view.showTranslation(mCurrentTranslation);
+            } else if (!view.getOriginalText().isEmpty()) {
+                mInteractor.startTranslation(view.getOriginalText(), mLanguageFrom, mLanguageTo);
+            }
         }
     }
 

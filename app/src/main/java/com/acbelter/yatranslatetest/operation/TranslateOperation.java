@@ -43,7 +43,11 @@ public class TranslateOperation extends ChronosOperation<TranslationModel> {
     @Nullable
     @Override
     public TranslationModel run() {
-        if (TextUtils.isEmpty(mText) || mText.length() > YandexTranslateApi.MAX_TEXT_LENGTH) {
+        if (TextUtils.isEmpty(mText)) {
+            return null;
+        }
+
+        if (mText.length() > YandexTranslateApi.MAX_TEXT_LENGTH) {
             return null;
         }
 

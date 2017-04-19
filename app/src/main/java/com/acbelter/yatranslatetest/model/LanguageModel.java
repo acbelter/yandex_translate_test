@@ -8,9 +8,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class LanguageModel implements Parcelable {
-    public Long _id;        // for cupboard
-    public String code;     // public for cupboard
-    public String label;    // public for cupboard
+    // cupboard needs the fields to be public
+    public Long _id;    // field for cupboard
+    public String code;
+    public String label;
 
     public LanguageModel() {}
 

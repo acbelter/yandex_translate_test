@@ -24,6 +24,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.acbelter.yatranslatetest.R;
 import com.acbelter.yatranslatetest.RequestConstants;
@@ -240,6 +241,15 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
             mDetectedLanguageText.setText(null);
             mDetectedLanguageText.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void showTranslationFail() {
+        mTranslationText.setText(null);
+        mDetectedLanguageText.setText(null);
+        mDetectedLanguageText.setVisibility(View.GONE);
+        Toast.makeText(getContext().getApplicationContext(),
+                R.string.toast_translation_fail, Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -5,5 +5,12 @@
 package com.acbelter.yatranslatetest.model;
 
 public class HistoryItemModel {
-    public Long _id; // for cupboard
+    // cupboard needs the fields to be public
+    public Long _id;    // field for cupboard
+    public String langFromCode;
+    public String langToCode;
+    public String originalText;
+    public String translationText;
+    public boolean isFavorite;
+    public long timestamp;
 }

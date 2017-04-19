@@ -123,7 +123,11 @@ public class TranslationPresenter implements Presenter<TranslationView> {
 
     public void finishTranslation(TranslationView view, TranslationModel translation) {
         mCurrentTranslation = translation;
-        view.showTranslation(translation);
+        if (translation != null) {
+            view.showTranslation(translation);
+        } else {
+            view.showTranslationFail();
+        }
     }
 
     public void clearTranslation(TranslationView view) {

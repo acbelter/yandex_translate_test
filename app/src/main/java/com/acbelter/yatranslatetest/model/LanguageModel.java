@@ -21,6 +21,7 @@ public class LanguageModel implements Parcelable {
     }
 
     protected LanguageModel(Parcel in) {
+        _id = (Long) in.readValue(Long.class.getClassLoader());
         code = in.readString();
         label = in.readString();
     }
@@ -61,6 +62,7 @@ public class LanguageModel implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(_id);
         dest.writeString(code);
         dest.writeString(label);
     }

@@ -11,7 +11,6 @@ import android.support.annotation.Nullable;
 import com.acbelter.yatranslatetest.Cache;
 import com.acbelter.yatranslatetest.MainApplication;
 import com.acbelter.yatranslatetest.Pref;
-import com.acbelter.yatranslatetest.model.HistoryItemModel;
 import com.acbelter.yatranslatetest.model.LanguageModel;
 import com.acbelter.yatranslatetest.network.NetworkClient;
 import com.acbelter.yatranslatetest.network.Parser;
@@ -24,8 +23,6 @@ import com.redmadrobot.chronos.ChronosOperationResult;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import okhttp3.CacheControl;
@@ -45,6 +42,7 @@ public class InitDataOperation extends ChronosOperation<Boolean> {
     @Nullable
     @Override
     public Boolean run() {
+        // For testing: simulate slow network connection
         if (MainApplication.SIMULATE_SLOW_NETWORK) {
             try {
                 Thread.sleep(MainApplication.SLOW_NETWORK_DELAY);
@@ -53,31 +51,16 @@ public class InitDataOperation extends ChronosOperation<Boolean> {
             }
         }
 
-        List<HistoryItemModel> history = mHistoryStorage.loadFromDatabase();
-        mHistoryStorage.setHistory(history);
+        mHistoryStorage.load();
 
         if (Pref.isLanguagesLoaded()) {
-            List<LanguageModel> languages = mLanguageStorage.loadFromDatabase();
-            Collections.sort(languages, new Comparator<LanguageModel>() {
-                @Override
-                public int compare(LanguageModel lang1, LanguageModel lang2) {
-                    return lang1.label.compareToIgnoreCase(lang2.label);
-                }
-            });
-            mLanguageStorage.setLanguages(languages);
+            mLanguageStorage.load();
         } else {
             Pref.setRecentLangCodeFrom(null);
             Pref.setRecentLangCodeTo(null);
 
-            List<LanguageModel> languages = loadLanguages();
-            Collections.sort(languages, new Comparator<LanguageModel>() {
-                @Override
-                public int compare(LanguageModel lang1, LanguageModel lang2) {
-                    return lang1.label.compareToIgnoreCase(lang2.label);
-                }
-            });
-            mLanguageStorage.setLanguages(languages);
-            mLanguageStorage.saveToDatabase();
+            List<LanguageModel> languages = loadLanguagesFromNetwork();
+            mLanguageStorage.save(languages);
         }
 
         if (!mLanguageStorage.isLanguagesLoaded()) {
@@ -96,7 +79,7 @@ public class InitDataOperation extends ChronosOperation<Boolean> {
         return true;
     }
 
-    private List<LanguageModel> loadLanguages() {
+    private List<LanguageModel> loadLanguagesFromNetwork() {
         OkHttpClient client = NetworkClient.provideOkHttpClient(Cache.provideCacheDir());
 
         Request request = new Request.Builder()

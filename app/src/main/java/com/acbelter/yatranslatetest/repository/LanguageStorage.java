@@ -11,6 +11,8 @@ import android.database.sqlite.SQLiteDatabase;
 import com.acbelter.yatranslatetest.model.LanguageModel;
 import com.acbelter.yatranslatetest.util.Logger;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import nl.qbusict.cupboard.QueryResultIterable;
@@ -42,10 +44,6 @@ public class LanguageStorage {
         return mLanguages;
     }
 
-    public void setLanguages(List<LanguageModel> languages) {
-        mLanguages = languages;
-    }
-
     public LanguageModel getLanguageByCode(String code) {
         if (mLanguages == null || code == null) {
             return null;
@@ -60,28 +58,41 @@ public class LanguageStorage {
         return null;
     }
 
-    public synchronized List<LanguageModel> loadFromDatabase() {
+    public synchronized void load() {
+        SQLiteDatabase db = mStorageDbHelper.getReadableDatabase();
         Cursor cursor = cupboard()
-                .withDatabase(mStorageDbHelper.getReadableDatabase())
+                .withDatabase(db)
                 .query(LanguageModel.class).getCursor();
         try {
             QueryResultIterable<LanguageModel> iterable =
                     cupboard().withCursor(cursor).iterate(LanguageModel.class);
-            List<LanguageModel> result = iterable.list(true);
-            Logger.d("Load languages from database: " + result.size());
-            return result;
+            List<LanguageModel> languages = iterable.list(true);
+
+            Collections.sort(languages, new Comparator<LanguageModel>() {
+                @Override
+                public int compare(LanguageModel lang1, LanguageModel lang2) {
+                    return lang1.label.compareToIgnoreCase(lang2.label);
+                }
+            });
+
+            mLanguages = languages;
+
+            Logger.d("Load languages from database: " + languages.size());
         } finally {
             if (!cursor.isClosed()) {
                 cursor.close();
             }
+            db.close();
         }
     }
 
-    public synchronized void saveToDatabase() {
+    public synchronized void save(List<LanguageModel> languages) {
         SQLiteDatabase db = mStorageDbHelper.getWritableDatabase();
         cupboard().withDatabase(db).delete(LanguageModel.class, null);
-        if (mLanguages != null) {
-            cupboard().withDatabase(db).put(mLanguages);
+        if (languages != null) {
+            cupboard().withDatabase(db).put(languages);
         }
+        mLanguages = languages;
+        db.close();
     }
 }

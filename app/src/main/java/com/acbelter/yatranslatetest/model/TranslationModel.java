@@ -15,6 +15,7 @@ public class TranslationModel implements Parcelable {
     public String detectedLangCode;
     public String langFromCode;
     public String langToCode;
+    public String originalText;
     protected List<String> mTranslations;
 
     public TranslationModel() {

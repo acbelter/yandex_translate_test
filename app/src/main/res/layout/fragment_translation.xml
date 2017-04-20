@@ -104,19 +104,6 @@
         android:indeterminate="true"
         android:visibility="invisible"/>
 
-    <ImageButton
-        android:id="@+id/btn_add_favorite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@id/btn_clear"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/add_to_favorite"
-        android:padding="8dp"
-        android:src="@drawable/ic_bookmark"
-        android:tint="@color/colorDarkGray"/>
-
     <TextView
         android:id="@+id/detected_language_text"
         android:layout_width="match_parent"
@@ -125,7 +112,6 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
-        android:layout_toLeftOf="@id/btn_add_favorite"
         android:textColor="@color/colorText"
         android:textSize="12sp"
         android:visibility="gone"
@@ -137,8 +123,7 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/license_text"
         android:layout_below="@id/detected_language_text"
-        android:layout_margin="8dp"
-        android:layout_toLeftOf="@id/btn_add_favorite">
+        android:layout_margin="8dp">
 
         <TextView
             android:id="@+id/translation_text"

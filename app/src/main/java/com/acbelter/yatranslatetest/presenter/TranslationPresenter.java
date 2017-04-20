@@ -10,8 +10,10 @@ import android.support.v4.app.Fragment;
 import com.acbelter.yatranslatetest.Pref;
 import com.acbelter.yatranslatetest.RequestConstants;
 import com.acbelter.yatranslatetest.interactor.Interactor;
+import com.acbelter.yatranslatetest.model.HistoryItemModel;
 import com.acbelter.yatranslatetest.model.LanguageModel;
 import com.acbelter.yatranslatetest.model.TranslationModel;
+import com.acbelter.yatranslatetest.repository.HistoryStorage;
 import com.acbelter.yatranslatetest.repository.LanguageStorage;
 import com.acbelter.yatranslatetest.view.TranslationView;
 import com.acbelter.yatranslatetest.view.ui.SelectLangActivity;
@@ -21,6 +23,7 @@ public class TranslationPresenter implements Presenter<TranslationView> {
     private Interactor mInteractor;
 
     private LanguageStorage mLanguageStorage;
+    private HistoryStorage mHistoryStorage;
 
     private LanguageModel mLanguageFrom;
     private LanguageModel mLanguageTo;
@@ -29,8 +32,9 @@ public class TranslationPresenter implements Presenter<TranslationView> {
 
     private boolean mIsFirstPresentation;
 
-    public TranslationPresenter(LanguageStorage languageStorage) {
+    public TranslationPresenter(LanguageStorage languageStorage, HistoryStorage historyStorage) {
         mLanguageStorage = languageStorage;
+        mHistoryStorage = historyStorage;
         mIsFirstPresentation = true;
     }
 
@@ -125,6 +129,9 @@ public class TranslationPresenter implements Presenter<TranslationView> {
         mCurrentTranslation = translation;
         if (translation != null) {
             view.showTranslation(translation);
+            HistoryItemModel historyItem = new HistoryItemModel(translation);
+            historyItem.timestamp = System.currentTimeMillis();
+            mHistoryStorage.saveItem(historyItem);
         } else {
             view.showTranslationFail();
         }

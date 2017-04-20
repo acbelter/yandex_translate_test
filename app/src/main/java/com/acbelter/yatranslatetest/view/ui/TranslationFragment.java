@@ -36,6 +36,7 @@ import com.acbelter.yatranslatetest.presenter.Presenter;
 import com.acbelter.yatranslatetest.presenter.PresenterId;
 import com.acbelter.yatranslatetest.presenter.PresentersHub;
 import com.acbelter.yatranslatetest.presenter.TranslationPresenter;
+import com.acbelter.yatranslatetest.repository.HistoryStorage;
 import com.acbelter.yatranslatetest.repository.LanguageStorage;
 import com.acbelter.yatranslatetest.util.Logger;
 import com.acbelter.yatranslatetest.util.Utils;
@@ -61,8 +62,6 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     protected EditText mOriginalEditText;
     @BindView(R.id.btn_clear)
     protected ImageButton mBtnClear;
-    @BindView(R.id.btn_add_favorite)
-    protected ImageButton mBtnAddFavorite;
     @BindView(R.id.translation_text)
     protected TextView mTranslationText;
     @BindView(R.id.detected_language_text)
@@ -90,14 +89,15 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
         mUiHandler = new Handler(Looper.getMainLooper());
 
         LanguageStorage languageStorage = LanguageStorage.getInstance(getContext());
+        HistoryStorage historyStorage = HistoryStorage.getInstance(getContext());
         if (savedInstanceState == null) {
-            mPresenter = new TranslationPresenter(languageStorage);
+            mPresenter = new TranslationPresenter(languageStorage, historyStorage);
             mPresentersHub.addPresenter(mPresenter);
         } else {
             PresenterId id = savedInstanceState.getParcelable(Presenter.KEY_PRESENTER_ID);
             mPresenter = (TranslationPresenter) mPresentersHub.getPresenterById(id);
             if (mPresenter == null) {
-                mPresenter = new TranslationPresenter(languageStorage);
+                mPresenter = new TranslationPresenter(languageStorage, historyStorage);
                 mPresentersHub.addPresenter(mPresenter);
             }
 
@@ -164,6 +164,7 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
                     @Override
                     public void afterTextChanged(final Editable s) {
                         mTimer.cancel();
+                        mPresenter.clearTranslation(TranslationFragment.this);
                         final String text = s.toString().trim();
                         if (!TextUtils.isEmpty(text)) {
                             mBtnClear.setVisibility(View.VISIBLE);
@@ -182,7 +183,6 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
                                     }, DELAY);
                         } else {
                             mBtnClear.setVisibility(View.INVISIBLE);
-                            mPresenter.clearTranslation(TranslationFragment.this);
                         }
                     }
                 }
@@ -304,11 +304,6 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
         mPresenter.cancelTranslation();
         mOriginalEditText.setText(null);
         mBtnClear.setVisibility(View.INVISIBLE);
-    }
-
-    @OnClick(R.id.btn_add_favorite)
-    public void onAddFavoriteClicked(View view) {
-
     }
 
     public void onOperationFinished(TranslateOperation.Result result) {

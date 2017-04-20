@@ -51,6 +51,7 @@ public class TranslateOperation extends ChronosOperation<TranslationModel> {
             return null;
         }
 
+        // For testing: simulate slow network connection
         if (MainApplication.SIMULATE_SLOW_NETWORK) {
             try {
                 Thread.sleep(MainApplication.SLOW_NETWORK_DELAY);
@@ -83,6 +84,7 @@ public class TranslateOperation extends ChronosOperation<TranslationModel> {
             Logger.d("Translation: " + data);
             TranslationModel translation = Parser.parseTranslation(data);
             if (translation.code == 200) {
+                translation.originalText = mText;
                 return translation;
             }
 

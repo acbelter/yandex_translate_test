@@ -10,7 +10,7 @@ import android.content.Intent;
 import com.acbelter.yatranslatetest.Pref;
 import com.acbelter.yatranslatetest.RequestConstants;
 import com.acbelter.yatranslatetest.model.LanguageModel;
-import com.acbelter.yatranslatetest.repository.LanguageStorage;
+import com.acbelter.yatranslatetest.storage.LanguageStorage;
 import com.acbelter.yatranslatetest.view.SelectLangView;
 
 public class SelectLangPresenter implements Presenter<SelectLangView> {
@@ -33,9 +33,13 @@ public class SelectLangPresenter implements Presenter<SelectLangView> {
         }
     }
 
-    public void setDetectLanguageState(boolean state) {
+    public void setDetectLanguageState(Activity activity, boolean state) {
         mDetectLanguageState = state;
         Pref.setDetectLang(state);
+
+        Intent data = new Intent();
+        data.putExtra(RequestConstants.KEY_LANG, mSelectedLanguage);
+        activity.setResult(Activity.RESULT_OK, data);
     }
 
     public void setSelectedLanguage(LanguageModel language) {

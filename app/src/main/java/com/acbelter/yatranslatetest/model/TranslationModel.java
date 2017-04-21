@@ -18,6 +18,14 @@ public class TranslationModel implements Parcelable {
     public TranslationModel() {
     }
 
+    public TranslationModel(HistoryItemModel item) {
+        detectedLangCode = item.detectedLangCode;
+        langFromCode = item.langFromCode;
+        langToCode = item.langToCode;
+        originalText = item.originalText;
+        translationText = item.translationText;
+    }
+
     protected TranslationModel(Parcel in) {
         code = in.readInt();
         detectedLangCode = in.readString();

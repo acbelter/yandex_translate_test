@@ -37,8 +37,8 @@ import com.acbelter.yatranslatetest.presenter.Presenter;
 import com.acbelter.yatranslatetest.presenter.PresenterId;
 import com.acbelter.yatranslatetest.presenter.PresentersHub;
 import com.acbelter.yatranslatetest.presenter.TranslationPresenter;
-import com.acbelter.yatranslatetest.repository.HistoryStorage;
-import com.acbelter.yatranslatetest.repository.LanguageStorage;
+import com.acbelter.yatranslatetest.storage.HistoryStorage;
+import com.acbelter.yatranslatetest.storage.LanguageStorage;
 import com.acbelter.yatranslatetest.util.Logger;
 import com.acbelter.yatranslatetest.util.Utils;
 import com.acbelter.yatranslatetest.view.TranslationView;
@@ -73,6 +73,7 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     private Unbinder mUnbinder;
 
     private TextWatcher mOriginalTextWatcher;
+    private boolean mOriginalTextWatcherAdded;
 
     private PresentersHub mPresentersHub = PresentersHub.getInstance();
 
@@ -106,32 +107,8 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
             }
 
             mSwapRotateClockwise = savedInstanceState.getBoolean("swap_rotate_clockwise");
+            mOriginalTextWatcherAdded = savedInstanceState.getBoolean("original_text_watcher_added");
         }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        mPresenter.setInteractor(new ChronosInteractor(this));
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        mPresenter.setInteractor(null);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        EventBus.getDefault().register(this);
-        mPresenter.present(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -140,6 +117,7 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
         outState.putParcelable(Presenter.KEY_PRESENTER_ID,
                 mPresentersHub.getIdForPresenter(mPresenter));
         outState.putBoolean("swap_rotate_clockwise", mSwapRotateClockwise);
+        outState.putBoolean("original_text_watcher_added", mOriginalTextWatcherAdded);
     }
 
     @Nullable
@@ -160,7 +138,7 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
         }
 
         mOriginalTextWatcher = new TextWatcher() {
-            private final long DELAY = 500L;
+            private final long DELAY = 1000L;
             private Timer mTimer = new Timer();
 
             @Override
@@ -172,7 +150,8 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
             }
 
             @Override
-            public void afterTextChanged(final Editable s) {
+            public void afterTextChanged(Editable s) {
+                Logger.d("Text is changed");
                 mTimer.cancel();
                 mPresenter.clearTranslation(TranslationFragment.this);
                 final String text = s.toString().trim();
@@ -197,13 +176,44 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
             }
         };
 
-        mOriginalEditText.addTextChangedListener(mOriginalTextWatcher);
         return view;
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        mPresenter.setInteractor(new ChronosInteractor(this));
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mPresenter.setInteractor(null);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        EventBus.getDefault().register(this);
+        mPresenter.present(this);
+
+        if (!mOriginalTextWatcherAdded) {
+            mOriginalEditText.addTextChangedListener(mOriginalTextWatcher);
+            mOriginalTextWatcherAdded = true;
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        EventBus.getDefault().unregister(this);
+        mOriginalEditText.removeTextChangedListener(mOriginalTextWatcher);
+        mOriginalTextWatcherAdded = false;
+    }
+
+    @Override
     public String getOriginalText() {
-        return mOriginalEditText.getText().toString();
+        return mOriginalEditText.getText().toString().trim();
     }
 
     @Override
@@ -238,7 +248,10 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
         if (translation != null) {
             mOriginalEditText.removeTextChangedListener(mOriginalTextWatcher);
             mOriginalEditText.setText(translation.originalText);
+            mOriginalEditText.setSelection(mOriginalEditText.getText().length());
             mOriginalEditText.addTextChangedListener(mOriginalTextWatcher);
+            mOriginalTextWatcherAdded = true;
+            mBtnClear.setVisibility(View.VISIBLE);
 
             mTranslationText.setText(translation.translationText);
             LanguageModel detectedLang = LanguageStorage.getInstance(getContext())
@@ -260,11 +273,21 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
 
     @Override
     public void showTranslationFail() {
+        mTranslationProgress.setVisibility(View.INVISIBLE);
         mTranslationText.setText(null);
         mDetectedLanguageText.setText(null);
         mDetectedLanguageText.setVisibility(View.GONE);
-        Toast.makeText(getContext().getApplicationContext(),
-                R.string.toast_translation_fail, Toast.LENGTH_SHORT).show();
+        if (!getOriginalText().isEmpty()) {
+            Toast.makeText(getContext().getApplicationContext(),
+                    R.string.toast_translation_fail, Toast.LENGTH_SHORT).show();
+            // Retry text translation
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mPresenter.startTranslation(TranslationFragment.this, getOriginalText());
+                }
+            }, 2000L);
+        }
     }
 
     @Override

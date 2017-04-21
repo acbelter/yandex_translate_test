@@ -11,4 +11,6 @@ public interface OnHistoryItemClickListener {
     void onFavoriteItemClicked(HistoryItemModel item);
     void onHistoryItemDeleted(HistoryItemModel item);
     void onFavoriteItemDeleted(HistoryItemModel item);
+    void onHistoryItemFavoriteStateChanged(HistoryItemModel item, boolean favorite);
+    void onFavoriteItemFavoriteStateChanged(HistoryItemModel item, boolean favorite);
 }

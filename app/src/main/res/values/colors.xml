@@ -9,6 +9,7 @@
     <color name="colorAccent">#FFDC61</color>
     <color name="colorLightGray">#CBCBCB</color>
     <color name="colorDarkGray">#858E98</color>
+    <color name="colorFavorite">#FFCC00</color>
     <color name="colorText">#AAAAAA</color>
     <color name="colorMainDark">@android:color/black</color>
     <color name="colorMainLight">#66000000</color>

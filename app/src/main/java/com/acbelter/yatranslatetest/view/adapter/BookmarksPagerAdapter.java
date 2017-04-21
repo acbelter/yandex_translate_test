@@ -15,9 +15,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.acbelter.yatranslatetest.R;
-import com.acbelter.yatranslatetest.repository.HistoryStorage;
+import com.acbelter.yatranslatetest.model.HistoryItemModel;
+import com.acbelter.yatranslatetest.storage.HistoryStorage;
 
-public class BookmarksPagerAdapter extends PagerAdapter {
+public class BookmarksPagerAdapter extends PagerAdapter implements HistoryAdapter.OnFavoriteClickListener {
     public static final int INDEX_HISTORY = 0;
     public static final int INDEX_FAVORITES = 1;
 
@@ -76,7 +77,6 @@ public class BookmarksPagerAdapter extends PagerAdapter {
                 }
             }
         });
-
         mHistoryEmptyStub = view.findViewById(R.id.empty_stub);
 
         updateHistory(container.getContext());
@@ -87,7 +87,7 @@ public class BookmarksPagerAdapter extends PagerAdapter {
 
     public void updateHistory(Context context) {
         mHistoryAdapter = new HistoryAdapter(context,
-                mHistoryStorage.getHistory());
+                mHistoryStorage.getHistory(), this);
         mHistoryList.setAdapter(mHistoryAdapter);
 
         if (!mHistoryAdapter.isEmpty()) {
@@ -114,7 +114,6 @@ public class BookmarksPagerAdapter extends PagerAdapter {
                 }
             }
         });
-
         mFavoritesEmptyStub = view.findViewById(R.id.empty_stub);
 
         updateFavorites(container.getContext());
@@ -125,7 +124,7 @@ public class BookmarksPagerAdapter extends PagerAdapter {
 
     public void updateFavorites(Context context) {
         mFavoritesAdapter = new HistoryAdapter(context,
-                mHistoryStorage.getFavoriteHistory());
+                mHistoryStorage.getFavoriteHistory(), this);
         mFavoritesList.setAdapter(mFavoritesAdapter);
 
         if (!mFavoritesAdapter.isEmpty()) {
@@ -133,14 +132,6 @@ public class BookmarksPagerAdapter extends PagerAdapter {
         } else {
             mFavoritesEmptyStub.setVisibility(View.VISIBLE);
         }
-    }
-
-    public ListView getHistoryList() {
-        return mHistoryList;
-    }
-
-    public ListView getFavoritesList() {
-        return mFavoritesList;
     }
 
     @Override
@@ -151,5 +142,18 @@ public class BookmarksPagerAdapter extends PagerAdapter {
     @Override
     public boolean isViewFromObject(View view, Object object) {
         return view == object;
+    }
+
+    @Override
+    public void onFavoriteClicked(HistoryAdapter adapter, HistoryItemModel item, boolean favorite) {
+        if (mItemClickListener == null) {
+            return;
+        }
+
+        if (adapter == mHistoryAdapter) {
+            mItemClickListener.onHistoryItemFavoriteStateChanged(item, favorite);
+        } else if (adapter == mFavoritesAdapter) {
+            mItemClickListener.onFavoriteItemFavoriteStateChanged(item, favorite);
+        }
     }
 }

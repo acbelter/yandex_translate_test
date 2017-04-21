@@ -24,7 +24,7 @@ import com.acbelter.yatranslatetest.presenter.PresenterId;
 import com.acbelter.yatranslatetest.presenter.PresentersHub;
 import com.acbelter.yatranslatetest.presenter.SelectLangMode;
 import com.acbelter.yatranslatetest.presenter.SelectLangPresenter;
-import com.acbelter.yatranslatetest.repository.LanguageStorage;
+import com.acbelter.yatranslatetest.storage.LanguageStorage;
 import com.acbelter.yatranslatetest.util.Utils;
 import com.acbelter.yatranslatetest.view.SelectLangView;
 import com.acbelter.yatranslatetest.view.adapter.LanguagesAdapter;
@@ -81,7 +81,7 @@ public class SelectLangActivity extends AppCompatActivity implements SelectLangV
         mDetectLangSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mPresenter.setDetectLanguageState(isChecked);
+                mPresenter.setDetectLanguageState(SelectLangActivity.this, isChecked);
             }
         });
 

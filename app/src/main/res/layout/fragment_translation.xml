@@ -78,7 +78,8 @@
         android:background="@drawable/bg_border"
         android:gravity="top"
         android:hint="@string/hint_original"
-        android:inputType="none"
+        android:imeOptions="actionDone"
+        android:inputType="textMultiLine"
         android:lines="4"
         android:padding="4dp"/>
 
@@ -123,7 +124,9 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/license_text"
         android:layout_below="@id/detected_language_text"
-        android:layout_margin="8dp">
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp">
 
         <TextView
             android:id="@+id/translation_text"
@@ -144,7 +147,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/license_url"
         android:layout_centerHorizontal="true"
-        android:paddingTop="4dp"
+        android:layout_marginTop="2dp"
         android:text="@string/license_text"/>
 
     <TextView
@@ -155,7 +158,7 @@
         android:layout_centerHorizontal="true"
         android:autoLink="web"
         android:linksClickable="true"
-        android:paddingBottom="4dp"
+        android:paddingBottom="2dp"
         android:text="@string/license_url"
         android:textColorLink="@color/colorLink"/>
 </RelativeLayout>

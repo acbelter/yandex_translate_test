@@ -2,7 +2,7 @@
  * Created by acbelter <acbelter@gmail.com>
  */
 
-package com.acbelter.yatranslatetest.repository;
+package com.acbelter.yatranslatetest.storage;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -57,6 +57,20 @@ public class HistoryStorage {
         return favoriteHistory;
     }
 
+    public boolean hasItemsWithFavoriteState(boolean favorite) {
+        if (mHistory == null || mHistory.isEmpty()) {
+            return false;
+        }
+
+        int count = 0;
+        for (int i = 0; i < mHistory.size(); i++) {
+            if (mHistory.get(i).isFavorite == favorite) {
+                count++;
+            }
+        }
+        return count != 0;
+    }
+
     public synchronized void load() {
         SQLiteDatabase db = mStorageDbHelper.getWritableDatabase();
         Cursor cursor = cupboard()
@@ -105,9 +119,11 @@ public class HistoryStorage {
         mHistory.remove(item);
     }
 
-    public void removeItemsWithFavoriteState(boolean favorite) {
+    public synchronized void removeItemsWithFavoriteState(boolean favorite) {
         SQLiteDatabase db = mStorageDbHelper.getWritableDatabase();
-        cupboard().withDatabase(db).delete(HistoryItemModel.class, "is_favorite = ?", favorite ? "0" : "1");
+        int count = cupboard().withDatabase(db).delete(HistoryItemModel.class,
+                "is_favorite = ?", favorite ? "1" : "0");
+        Logger.d("Delete history items: " + count);
         db.close();
         Iterator<HistoryItemModel> iterator = mHistory.iterator();
         while (iterator.hasNext()) {

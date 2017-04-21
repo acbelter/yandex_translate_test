@@ -2,7 +2,7 @@
  * Created by acbelter <acbelter@gmail.com>
  */
 
-package com.acbelter.yatranslatetest.repository;
+package com.acbelter.yatranslatetest.storage;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

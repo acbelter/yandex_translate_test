@@ -4,10 +4,13 @@
 
 package com.acbelter.yatranslatetest.view.ui;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -140,14 +143,61 @@ public class BookmarksFragment extends ChronosSupportFragment implements
 
     @OnClick(R.id.btn_clear)
     public void onClearClicked() {
-        switch (mTabs.getSelectedTabPosition()) {
+        final int selectedTabIndex = mTabs.getSelectedTabPosition();
+        switch (selectedTabIndex) {
             case BookmarksPagerAdapter.INDEX_HISTORY:
-                mPresenter.clearHistory(getContext(), this);
+                if (!mPresenter.hasNotFavoriteItems(getContext())) {
+                    return;
+                }
                 break;
             case BookmarksPagerAdapter.INDEX_FAVORITES:
-                mPresenter.clearFavorites(getContext(), this);
+                if (!mPresenter.hasFavoriteItems(getContext())) {
+                    return;
+                }
                 break;
         }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(R.string.confirmation);
+        builder.setCancelable(true);
+
+        switch (selectedTabIndex) {
+            case BookmarksPagerAdapter.INDEX_HISTORY:
+                builder.setMessage(R.string.clear_history_text);
+                break;
+            case BookmarksPagerAdapter.INDEX_FAVORITES:
+                builder.setMessage(R.string.clear_favorites_text);
+                break;
+        }
+
+        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                switch (selectedTabIndex) {
+                    case BookmarksPagerAdapter.INDEX_HISTORY:
+                        mPresenter.clearHistory(getContext(), BookmarksFragment.this);
+                        break;
+                    case BookmarksPagerAdapter.INDEX_FAVORITES:
+                        mPresenter.clearFavorites(getContext(), BookmarksFragment.this);
+                        break;
+                }
+                dialog.cancel();
+            }
+        });
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        int buttonsColor = ContextCompat.getColor(getContext(), R.color.colorMainDark);
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(buttonsColor);
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(buttonsColor);
     }
 
     @Override
@@ -168,6 +218,16 @@ public class BookmarksFragment extends ChronosSupportFragment implements
     @Override
     public void onFavoriteItemDeleted(HistoryItemModel item) {
 
+    }
+
+    @Override
+    public void onHistoryItemFavoriteStateChanged(HistoryItemModel item, boolean favorite) {
+        mPresenter.setHistoryItemFavoriteState(getContext(), this, item, favorite);
+    }
+
+    @Override
+    public void onFavoriteItemFavoriteStateChanged(HistoryItemModel item, boolean favorite) {
+        mPresenter.setFavoriteItemFavoriteState(getContext(), this, item, favorite);
     }
 
     public static String tag() {

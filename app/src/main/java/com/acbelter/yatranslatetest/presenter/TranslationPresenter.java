@@ -13,8 +13,8 @@ import com.acbelter.yatranslatetest.interactor.Interactor;
 import com.acbelter.yatranslatetest.model.HistoryItemModel;
 import com.acbelter.yatranslatetest.model.LanguageModel;
 import com.acbelter.yatranslatetest.model.TranslationModel;
-import com.acbelter.yatranslatetest.repository.HistoryStorage;
-import com.acbelter.yatranslatetest.repository.LanguageStorage;
+import com.acbelter.yatranslatetest.storage.HistoryStorage;
+import com.acbelter.yatranslatetest.storage.LanguageStorage;
 import com.acbelter.yatranslatetest.view.TranslationView;
 import com.acbelter.yatranslatetest.view.ui.SelectLangActivity;
 

@@ -7,8 +7,8 @@ package com.acbelter.yatranslatetest.presenter;
 import android.content.Context;
 
 import com.acbelter.yatranslatetest.interactor.Interactor;
-import com.acbelter.yatranslatetest.repository.HistoryStorage;
-import com.acbelter.yatranslatetest.repository.LanguageStorage;
+import com.acbelter.yatranslatetest.storage.HistoryStorage;
+import com.acbelter.yatranslatetest.storage.LanguageStorage;
 import com.acbelter.yatranslatetest.util.Logger;
 import com.acbelter.yatranslatetest.view.SplashView;
 

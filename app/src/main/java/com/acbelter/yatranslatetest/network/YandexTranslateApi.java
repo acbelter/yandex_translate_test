@@ -11,8 +11,6 @@ import java.net.MalformedURLException;
 import okhttp3.HttpUrl;
 
 public class YandexTranslateApi {
-    public static final int MAX_TEXT_LENGTH = 10000;
-
     private static final HttpUrl BASE_URL =
             HttpUrl.parse("https://translate.yandex.net/api/v1.5/tr.json");
     private static final String API_KEY =
@@ -30,9 +28,14 @@ public class YandexTranslateApi {
     }
 
     // See https://tech.yandex.ru/translate/doc/dg/reference/translate-docpage/
-    public static HttpUrl buildTranslateUrl(String langFromCode,
+    public static HttpUrl buildTranslateUrl(String text,
+                                            String langFromCode,
                                             String langToCode,
                                             String format) throws MalformedURLException {
+        if (TextUtils.isEmpty(text)) {
+            throw new MalformedURLException("Empty text");
+        }
+
         if (!FORMAT_PLAIN.equals(format) && !FORMAT_HTML.equals(format)) {
             throw new MalformedURLException("Invalid format");
         }
@@ -51,6 +54,7 @@ public class YandexTranslateApi {
         return BASE_URL.newBuilder()
                 .addPathSegment("translate")
                 .addQueryParameter("key", API_KEY)
+                .addQueryParameter("text", text)
                 .addQueryParameter("lang", lang)
                 .addQueryParameter("format", format)
                 .addQueryParameter("options", "1")

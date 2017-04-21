@@ -21,10 +21,8 @@ import com.redmadrobot.chronos.ChronosOperationResult;
 
 import java.io.IOException;
 
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class TranslateOperation extends ChronosOperation<TranslationModel> {
@@ -47,10 +45,6 @@ public class TranslateOperation extends ChronosOperation<TranslationModel> {
             return null;
         }
 
-        if (mText.length() > YandexTranslateApi.MAX_TEXT_LENGTH) {
-            return null;
-        }
-
         // For testing: simulate slow network connection
         if (MainApplication.SIMULATE_SLOW_NETWORK) {
             try {
@@ -64,12 +58,11 @@ public class TranslateOperation extends ChronosOperation<TranslationModel> {
 
         Response response = null;
         try {
-            RequestBody requestBody =
-                    RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"), "text=" + mText);
+//            RequestBody requestBody =
+//                    RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"), "text=" + mText);
             Request request = new Request.Builder()
                     .url(YandexTranslateApi.buildTranslateUrl(
-                            mLangFromCode, mLangToCode, YandexTranslateApi.FORMAT_PLAIN))
-                    .post(requestBody)
+                            mText, mLangFromCode, mLangToCode, YandexTranslateApi.FORMAT_PLAIN))
                     .build();
 
             response = client.newCall(request).execute();

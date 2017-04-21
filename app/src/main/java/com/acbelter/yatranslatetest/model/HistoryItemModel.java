@@ -12,6 +12,8 @@ import nl.qbusict.cupboard.annotation.Column;
 public class HistoryItemModel implements Parcelable {
     // cupboard needs the fields to be public
     public Long _id;    // field for cupboard
+    @Column("detected_lang_code")
+    public String detectedLangCode;
     @Column("lang_from_code")
     public String langFromCode;
     @Column("lang_to_code")
@@ -27,16 +29,18 @@ public class HistoryItemModel implements Parcelable {
     public HistoryItemModel() {}
 
     public HistoryItemModel(TranslationModel translation) {
+        detectedLangCode = translation.detectedLangCode;
         langFromCode = translation.langFromCode;
         langToCode = translation.langToCode;
         originalText = translation.originalText;
-        translationText = translation.buildTranslationText();
+        translationText = translation.translationText;
         isFavorite = false;
         timestamp = 0L;
     }
 
     protected HistoryItemModel(Parcel in) {
         _id = (Long) in.readValue(Long.class.getClassLoader());
+        detectedLangCode = in.readString();
         langFromCode = in.readString();
         langToCode = in.readString();
         originalText = in.readString();
@@ -82,6 +86,7 @@ public class HistoryItemModel implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(_id);
+        dest.writeString(detectedLangCode);
         dest.writeString(langFromCode);
         dest.writeString(langToCode);
         dest.writeString(originalText);

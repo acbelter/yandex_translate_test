@@ -6,7 +6,7 @@ package com.acbelter.yatranslatetest.view;
 
 import com.acbelter.yatranslatetest.model.LanguageModel;
 
-public interface SelectLangView {
+public interface SelectLangView extends PresenterView {
     void setDetectLanguageState(boolean state);
     void setDetectLanguageUiVisible(boolean visible);
     void setSelectedLanguage(LanguageModel language);

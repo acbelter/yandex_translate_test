@@ -42,10 +42,16 @@ public class Parser {
         translation.langFromCode = langs[0];
         translation.langToCode = langs[1];
 
+        StringBuilder builder = new StringBuilder();
         JSONArray textArray = translationObj.getJSONArray("text");
         for (int i = 0; i < textArray.length(); i++) {
-            translation.addTranslation(textArray.getString(i));
+            builder.append(textArray.getString(i));
+            if (i != textArray.length() - 1) {
+                builder.append("\n");
+            }
         }
+
+        translation.translationText = builder.toString();
         return translation;
     }
 }

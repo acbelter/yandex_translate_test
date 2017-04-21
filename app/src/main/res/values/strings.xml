@@ -19,8 +19,10 @@
 
     <!--Bookmarks screen-->
     <string name="history">History</string>
-    <string name="favorite">Favorite</string>
+    <string name="favorites">Favorites</string>
     <string name="clear">Clear</string>
+    <string name="empty_history_text">No translations\nin history</string>
+    <string name="empty_favorites_text">No translations\nin favorites</string>
 
     <!--Select language screen-->
     <string name="text_language">Language of text</string>

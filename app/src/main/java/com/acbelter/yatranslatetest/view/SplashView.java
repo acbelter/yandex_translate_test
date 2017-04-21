@@ -4,6 +4,6 @@
 
 package com.acbelter.yatranslatetest.view;
 
-public interface SplashView {
+public interface SplashView extends PresenterView {
     void hide();
 }

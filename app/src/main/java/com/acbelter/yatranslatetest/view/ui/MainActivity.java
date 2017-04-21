@@ -13,14 +13,17 @@ import android.view.WindowManager;
 
 import com.acbelter.yatranslatetest.R;
 import com.acbelter.yatranslatetest.RequestConstants;
+import com.acbelter.yatranslatetest.presenter.HistoryTranslationEvent;
 import com.acbelter.yatranslatetest.presenter.PresentersHub;
 import com.acbelter.yatranslatetest.repository.HistoryStorage;
 import com.acbelter.yatranslatetest.repository.LanguageStorage;
+import com.acbelter.yatranslatetest.util.Logger;
 import com.acbelter.yatranslatetest.util.Utils;
 import com.acbelter.yatranslatetest.view.adapter.MainPagerAdapter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.greenrobot.event.EventBus;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
     @BindView(R.id.content_view_pager)
@@ -71,12 +74,14 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     protected void onResume() {
         super.onResume();
+        EventBus.getDefault().register(this);
         mTabs.addOnTabSelectedListener(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        EventBus.getDefault().unregister(this);
         mTabs.removeOnTabSelectedListener(this);
     }
 
@@ -107,5 +112,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
 
+    }
+
+    public void onEvent(HistoryTranslationEvent event) {
+        Logger.d(getClass(), "History translation event");
+        mContentViewPager.setCurrentItem(MainPagerAdapter.INDEX_TRANSLATION);
     }
 }

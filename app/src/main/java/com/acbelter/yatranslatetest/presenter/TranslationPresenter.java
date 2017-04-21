@@ -18,6 +18,8 @@ import com.acbelter.yatranslatetest.repository.LanguageStorage;
 import com.acbelter.yatranslatetest.view.TranslationView;
 import com.acbelter.yatranslatetest.view.ui.SelectLangActivity;
 
+import de.greenrobot.event.EventBus;
+
 public class TranslationPresenter implements Presenter<TranslationView> {
     private int mPresenterId;
     private Interactor mInteractor;
@@ -129,9 +131,13 @@ public class TranslationPresenter implements Presenter<TranslationView> {
         mCurrentTranslation = translation;
         if (translation != null) {
             view.showTranslation(translation);
+
             HistoryItemModel historyItem = new HistoryItemModel(translation);
             historyItem.timestamp = System.currentTimeMillis();
             mHistoryStorage.saveItem(historyItem);
+
+            // FIXME Small hack: post event to update history
+            EventBus.getDefault().post(new HistoryUpdatedEvent());
         } else {
             view.showTranslationFail();
         }

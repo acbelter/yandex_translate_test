@@ -9,17 +9,37 @@ import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.acbelter.yatranslatetest.R;
+import com.acbelter.yatranslatetest.repository.HistoryStorage;
 
 public class BookmarksPagerAdapter extends PagerAdapter {
     public static final int INDEX_HISTORY = 0;
-    public static final int INDEX_FAVORITE = 1;
+    public static final int INDEX_FAVORITES = 1;
 
-    private LayoutInflater mInflater;
+    private ListView mHistoryList;
+    private ListView mFavoritesList;
+
+    private View mHistoryEmptyStub;
+    private View mFavoritesEmptyStub;
+
+    private HistoryAdapter mHistoryAdapter;
+    private HistoryAdapter mFavoritesAdapter;
+
+    private HistoryStorage mHistoryStorage;
+
+    private OnHistoryItemClickListener mItemClickListener;
 
     public BookmarksPagerAdapter(Context context) {
-        mInflater = LayoutInflater.from(context);
+        mHistoryStorage = HistoryStorage.getInstance(context);
+    }
+
+    public void setItemClickListener(OnHistoryItemClickListener listener) {
+        mItemClickListener = listener;
     }
 
     @Override
@@ -32,23 +52,95 @@ public class BookmarksPagerAdapter extends PagerAdapter {
         switch (position) {
             case INDEX_HISTORY:
                 return instantiateHistoryPage(container);
-            case INDEX_FAVORITE:
-                return instantiateFavoritePage(container);
+            case INDEX_FAVORITES:
+                return instantiateFavoritesPage(container);
             default:
                 return null;
         }
     }
 
     private View instantiateHistoryPage(ViewGroup container) {
-        View view = mInflater.inflate(R.layout.pager_item_history, container, false);
+        View view = LayoutInflater.from(container.getContext())
+                .inflate(R.layout.pager_item_bookmarks, container, false);
+        ((ImageView) view.findViewById(R.id.empty_stub_image))
+                .setImageResource(R.drawable.ic_watch_later_big);
+        ((TextView) view.findViewById(R.id.empty_stub_text))
+                .setText(R.string.empty_history_text);
+
+        mHistoryList = (ListView) view.findViewById(R.id.items_list);
+        mHistoryList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (mItemClickListener != null) {
+                    mItemClickListener.onHistoryItemClicked(mHistoryAdapter.getItem(position));
+                }
+            }
+        });
+
+        mHistoryEmptyStub = view.findViewById(R.id.empty_stub);
+
+        updateHistory(container.getContext());
+
         container.addView(view);
         return view;
     }
 
-    private View instantiateFavoritePage(ViewGroup container) {
-        View view = mInflater.inflate(R.layout.pager_item_favorite, container, false);
+    public void updateHistory(Context context) {
+        mHistoryAdapter = new HistoryAdapter(context,
+                mHistoryStorage.getHistory());
+        mHistoryList.setAdapter(mHistoryAdapter);
+
+        if (!mHistoryAdapter.isEmpty()) {
+            mHistoryEmptyStub.setVisibility(View.GONE);
+        } else {
+            mHistoryEmptyStub.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private View instantiateFavoritesPage(ViewGroup container) {
+        View view = LayoutInflater.from(container.getContext())
+                .inflate(R.layout.pager_item_bookmarks, container, false);
+        ((ImageView) view.findViewById(R.id.empty_stub_image))
+                .setImageResource(R.drawable.ic_bookmark_big);
+        ((TextView) view.findViewById(R.id.empty_stub_text))
+                .setText(R.string.empty_favorites_text);
+
+        mFavoritesList = (ListView) view.findViewById(R.id.items_list);
+        mFavoritesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (mItemClickListener != null) {
+                    mItemClickListener.onFavoriteItemClicked(mFavoritesAdapter.getItem(position));
+                }
+            }
+        });
+
+        mFavoritesEmptyStub = view.findViewById(R.id.empty_stub);
+
+        updateFavorites(container.getContext());
+
         container.addView(view);
         return view;
+    }
+
+    public void updateFavorites(Context context) {
+        mFavoritesAdapter = new HistoryAdapter(context,
+                mHistoryStorage.getFavoriteHistory());
+        mFavoritesList.setAdapter(mFavoritesAdapter);
+
+        if (!mFavoritesAdapter.isEmpty()) {
+            mFavoritesEmptyStub.setVisibility(View.GONE);
+        } else {
+            mFavoritesEmptyStub.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public ListView getHistoryList() {
+        return mHistoryList;
+    }
+
+    public ListView getFavoritesList() {
+        return mFavoritesList;
     }
 
     @Override

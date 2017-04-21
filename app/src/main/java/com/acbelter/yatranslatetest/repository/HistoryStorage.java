@@ -15,6 +15,7 @@ import com.acbelter.yatranslatetest.util.Logger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import nl.qbusict.cupboard.QueryResultIterable;
@@ -43,7 +44,7 @@ public class HistoryStorage {
     }
 
     public List<HistoryItemModel> getHistory() {
-        return mHistory;
+        return new ArrayList<>(mHistory);
     }
 
     public List<HistoryItemModel> getFavoriteHistory() {
@@ -102,6 +103,19 @@ public class HistoryStorage {
         cupboard().withDatabase(db).delete(item);
         db.close();
         mHistory.remove(item);
+    }
+
+    public void removeItemsWithFavoriteState(boolean favorite) {
+        SQLiteDatabase db = mStorageDbHelper.getWritableDatabase();
+        cupboard().withDatabase(db).delete(HistoryItemModel.class, "is_favorite = ?", favorite ? "0" : "1");
+        db.close();
+        Iterator<HistoryItemModel> iterator = mHistory.iterator();
+        while (iterator.hasNext()) {
+            HistoryItemModel item = iterator.next();
+            if (item.isFavorite == favorite) {
+                iterator.remove();
+            }
+        }
     }
 
     public synchronized void setItemFavoriteState(HistoryItemModel item, boolean favorite) {

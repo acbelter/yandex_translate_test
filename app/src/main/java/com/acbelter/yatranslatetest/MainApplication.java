@@ -6,6 +6,11 @@ package com.acbelter.yatranslatetest;
 
 import android.app.Application;
 
+import com.facebook.stetho.Stetho;
+
+import nl.qbusict.cupboard.CupboardBuilder;
+import nl.qbusict.cupboard.CupboardFactory;
+
 public class MainApplication extends Application {
     public static final String TAG = "YATEST";
     public static final boolean DEBUG = true;
@@ -15,6 +20,8 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        CupboardFactory.setCupboard(new CupboardBuilder().useAnnotations().build());
+        Stetho.initializeWithDefaults(this);
         Pref.init(this);
         Cache.init(this);
     }

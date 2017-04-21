@@ -32,6 +32,7 @@ import com.acbelter.yatranslatetest.interactor.ChronosInteractor;
 import com.acbelter.yatranslatetest.model.LanguageModel;
 import com.acbelter.yatranslatetest.model.TranslationModel;
 import com.acbelter.yatranslatetest.operation.TranslateOperation;
+import com.acbelter.yatranslatetest.presenter.HistoryTranslationEvent;
 import com.acbelter.yatranslatetest.presenter.Presenter;
 import com.acbelter.yatranslatetest.presenter.PresenterId;
 import com.acbelter.yatranslatetest.presenter.PresentersHub;
@@ -50,6 +51,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import de.greenrobot.event.EventBus;
 
 public class TranslationFragment extends ChronosSupportFragment implements TranslationView {
     @BindView(R.id.lang_from_label)
@@ -69,6 +71,8 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     @BindView(R.id.translation_progress)
     protected ProgressBar mTranslationProgress;
     private Unbinder mUnbinder;
+
+    private TextWatcher mOriginalTextWatcher;
 
     private PresentersHub mPresentersHub = PresentersHub.getInstance();
 
@@ -120,7 +124,14 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     @Override
     public void onResume() {
         super.onResume();
+        EventBus.getDefault().register(this);
         mPresenter.present(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -148,45 +159,45 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
             mBtnSwapLangs.setBackgroundResource(0);
         }
 
-        mOriginalEditText.addTextChangedListener(
-                new TextWatcher() {
-                    private final long DELAY = 500L;
-                    private Timer mTimer = new Timer();
+        mOriginalTextWatcher = new TextWatcher() {
+            private final long DELAY = 500L;
+            private Timer mTimer = new Timer();
 
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    }
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
-                    @Override
-                    public void afterTextChanged(final Editable s) {
-                        mTimer.cancel();
-                        mPresenter.clearTranslation(TranslationFragment.this);
-                        final String text = s.toString().trim();
-                        if (!TextUtils.isEmpty(text)) {
-                            mBtnClear.setVisibility(View.VISIBLE);
-                            mTimer = new Timer();
-                            mTimer.schedule(
-                                    new TimerTask() {
+            @Override
+            public void afterTextChanged(final Editable s) {
+                mTimer.cancel();
+                mPresenter.clearTranslation(TranslationFragment.this);
+                final String text = s.toString().trim();
+                if (!TextUtils.isEmpty(text)) {
+                    mBtnClear.setVisibility(View.VISIBLE);
+                    mTimer = new Timer();
+                    mTimer.schedule(
+                            new TimerTask() {
+                                @Override
+                                public void run() {
+                                    mUiHandler.post(new Runnable() {
                                         @Override
                                         public void run() {
-                                            mUiHandler.post(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    mPresenter.startTranslation(TranslationFragment.this, text);
-                                                }
-                                            });
+                                            mPresenter.startTranslation(TranslationFragment.this, text);
                                         }
-                                    }, DELAY);
-                        } else {
-                            mBtnClear.setVisibility(View.INVISIBLE);
-                        }
-                    }
+                                    });
+                                }
+                            }, DELAY);
+                } else {
+                    mBtnClear.setVisibility(View.INVISIBLE);
                 }
-        );
+            }
+        };
+
+        mOriginalEditText.addTextChangedListener(mOriginalTextWatcher);
         return view;
     }
 
@@ -225,7 +236,11 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     public void showTranslation(TranslationModel translation) {
         mTranslationProgress.setVisibility(View.INVISIBLE);
         if (translation != null) {
-            mTranslationText.setText(translation.buildTranslationText());
+            mOriginalEditText.removeTextChangedListener(mOriginalTextWatcher);
+            mOriginalEditText.setText(translation.originalText);
+            mOriginalEditText.addTextChangedListener(mOriginalTextWatcher);
+
+            mTranslationText.setText(translation.translationText);
             LanguageModel detectedLang = LanguageStorage.getInstance(getContext())
                     .getLanguageByCode(translation.detectedLangCode);
             if (detectedLang != null) {
@@ -310,6 +325,11 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
         Logger.d("Translation operation is finished");
         TranslationModel translation = !result.getOperation().isCancelled() ? result.getOutput() : null;
         mPresenter.finishTranslation(this, translation);
+    }
+
+    public void onEvent(HistoryTranslationEvent event) {
+        Logger.d(getClass(), "History translation event");
+        showTranslation(event.getTranslation());
     }
 
     @Override

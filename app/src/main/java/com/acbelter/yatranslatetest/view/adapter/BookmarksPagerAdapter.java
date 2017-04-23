@@ -87,7 +87,7 @@ public class BookmarksPagerAdapter extends PagerAdapter implements HistoryAdapte
 
     public void updateHistory(Context context) {
         mHistoryAdapter = new HistoryAdapter(context,
-                mHistoryStorage.getHistory(), this);
+                mHistoryStorage.getHistory(false), this);
         mHistoryList.setAdapter(mHistoryAdapter);
 
         if (!mHistoryAdapter.isEmpty()) {
@@ -124,7 +124,7 @@ public class BookmarksPagerAdapter extends PagerAdapter implements HistoryAdapte
 
     public void updateFavorites(Context context) {
         mFavoritesAdapter = new HistoryAdapter(context,
-                mHistoryStorage.getFavoriteHistory(), this);
+                mHistoryStorage.getHistory(true), this);
         mFavoritesList.setAdapter(mFavoritesAdapter);
 
         if (!mFavoritesAdapter.isEmpty()) {

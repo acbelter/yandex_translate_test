@@ -6,6 +6,7 @@ package com.acbelter.yatranslatetest.presenter;
 
 import android.content.Intent;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 
 import com.acbelter.yatranslatetest.Pref;
 import com.acbelter.yatranslatetest.RequestConstants;
@@ -108,7 +109,7 @@ public class TranslationPresenter implements Presenter<TranslationView> {
     }
 
     public void startTranslation(TranslationView view, String text) {
-        if (mInteractor == null) {
+        if (mInteractor == null || TextUtils.isEmpty(text)) {
             return;
         }
 

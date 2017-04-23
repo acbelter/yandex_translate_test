@@ -63,6 +63,7 @@ public class TranslateOperation extends ChronosOperation<TranslationModel> {
             Request request = new Request.Builder()
                     .url(YandexTranslateApi.buildTranslateUrl(
                             mText, mLangFromCode, mLangToCode, YandexTranslateApi.FORMAT_PLAIN))
+//                    .post(requestBody)
                     .build();
 
             response = client.newCall(request).execute();

@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -20,12 +21,14 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.acbelter.yatranslatetest.Pref;
 import com.acbelter.yatranslatetest.R;
 import com.acbelter.yatranslatetest.RequestConstants;
 import com.acbelter.yatranslatetest.interactor.ChronosInteractor;
@@ -136,6 +139,9 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
             mLangToText.setBackgroundResource(0);
             mBtnSwapLangs.setBackgroundResource(0);
         }
+
+        mOriginalEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        mOriginalEditText.setRawInputType(InputType.TYPE_CLASS_TEXT);
 
         mOriginalTextWatcher = new TextWatcher() {
             private final long DELAY = 1000L;
@@ -256,7 +262,7 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
             mTranslationText.setText(translation.translationText);
             LanguageModel detectedLang = LanguageStorage.getInstance(getContext())
                     .getLanguageByCode(translation.detectedLangCode);
-            if (detectedLang != null) {
+            if (Pref.isDetectLang() && detectedLang != null) {
                 mDetectedLanguageText.setText(
                         getString(R.string.detected_language, detectedLang.label));
                 mDetectedLanguageText.setVisibility(View.VISIBLE);

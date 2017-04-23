@@ -44,7 +44,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         PresentersHub.attach(getSupportFragmentManager());
 
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN|
+                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
 
         mTranslationDrawable =
                 Utils.getTintDrawable(this, R.drawable.ic_translate, R.color.colorLightGray);

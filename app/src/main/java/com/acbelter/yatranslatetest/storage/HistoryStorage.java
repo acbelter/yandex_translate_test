@@ -47,14 +47,14 @@ public class HistoryStorage {
         return new ArrayList<>(mHistory);
     }
 
-    public List<HistoryItemModel> getFavoriteHistory() {
-        List<HistoryItemModel> favoriteHistory = new ArrayList<>();
+    public List<HistoryItemModel> getHistory(boolean favorite) {
+        List<HistoryItemModel> items = new ArrayList<>();
         for (HistoryItemModel item : mHistory) {
-            if (item.isFavorite) {
-                favoriteHistory.add(item);
+            if (item.isFavorite == favorite) {
+                items.add(item);
             }
         }
-        return favoriteHistory;
+        return items;
     }
 
     public boolean hasItemsWithFavoriteState(boolean favorite) {

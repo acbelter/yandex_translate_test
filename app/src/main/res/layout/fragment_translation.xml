@@ -78,9 +78,8 @@
         android:background="@drawable/bg_border"
         android:gravity="top"
         android:hint="@string/hint_original"
-        android:imeOptions="actionDone"
         android:inputType="textMultiLine"
-        android:lines="4"
+        android:lines="8"
         android:padding="4dp"/>
 
     <ImageButton
@@ -134,7 +133,6 @@
             android:layout_height="wrap_content"
             android:focusable="true"
             android:longClickable="true"
-            android:maxLines="4"
             android:textColor="@color/colorMainDark"
             android:textIsSelectable="true"
             android:textSize="18sp"

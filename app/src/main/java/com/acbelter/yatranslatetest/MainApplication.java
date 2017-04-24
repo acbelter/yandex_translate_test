@@ -14,7 +14,7 @@ import nl.qbusict.cupboard.CupboardFactory;
 public class MainApplication extends Application {
     public static final String TAG = "YATEST";
     // Включение/выключение режима отладки
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
     // Включение/выключение режима симуляции медленного сетевого соединения
     public static final boolean SIMULATE_SLOW_NETWORK = false;
     // Задержка для эмуляции медленного сетевого соединения

@@ -10,6 +10,7 @@ import android.text.TextUtils;
 
 import com.acbelter.yatranslatetest.Cache;
 import com.acbelter.yatranslatetest.MainApplication;
+import com.acbelter.yatranslatetest.Pref;
 import com.acbelter.yatranslatetest.model.LanguageModel;
 import com.acbelter.yatranslatetest.model.TranslationModel;
 import com.acbelter.yatranslatetest.network.NetworkClient;
@@ -60,9 +61,10 @@ public class TranslateOperation extends ChronosOperation<TranslationModel> {
         try {
 //            RequestBody requestBody =
 //                    RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"), "text=" + mText);
+            String requestLangFromCode = Pref.isDetectLang() ? null : mLangFromCode;
             Request request = new Request.Builder()
                     .url(YandexTranslateApi.buildTranslateUrl(
-                            mText, mLangFromCode, mLangToCode, YandexTranslateApi.FORMAT_PLAIN))
+                            mText, requestLangFromCode, mLangToCode, YandexTranslateApi.FORMAT_PLAIN))
 //                    .post(requestBody)
                     .build();
 
@@ -78,6 +80,7 @@ public class TranslateOperation extends ChronosOperation<TranslationModel> {
             Logger.d("Translation: " + data);
             TranslationModel translation = Parser.parseTranslation(data);
             if (translation.code == 200) {
+                translation.langFromCode = mLangFromCode;
                 translation.originalText = mText;
                 return translation;
             }

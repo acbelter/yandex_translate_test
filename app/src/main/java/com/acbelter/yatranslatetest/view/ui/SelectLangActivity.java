@@ -114,6 +114,12 @@ public class SelectLangActivity extends AppCompatActivity implements SelectLangV
     }
 
     @Override
+    public void onBackPressed() {
+        setResult(RESULT_CANCELED);
+        super.onBackPressed();
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(Presenter.KEY_PRESENTER_ID,
@@ -125,6 +131,7 @@ public class SelectLangActivity extends AppCompatActivity implements SelectLangV
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                setResult(RESULT_CANCELED);
                 finish();
                 break;
         }

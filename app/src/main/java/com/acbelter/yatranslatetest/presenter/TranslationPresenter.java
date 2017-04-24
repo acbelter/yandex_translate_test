@@ -114,13 +114,7 @@ public class TranslationPresenter implements Presenter<TranslationView> {
         }
 
         clearTranslation(view);
-
-        if (Pref.isDetectLang()) {
-            mInteractor.startTranslation(text, null, mLanguageTo);
-        } else {
-            mInteractor.startTranslation(text, mLanguageFrom, mLanguageTo);
-        }
-
+        mInteractor.startTranslation(text, mLanguageFrom, mLanguageTo);
         view.showTranslationProcess();
     }
 

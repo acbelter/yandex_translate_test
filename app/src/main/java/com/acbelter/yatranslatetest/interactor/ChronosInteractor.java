@@ -28,6 +28,10 @@ public class ChronosInteractor implements Interactor {
     public void startTranslation(String text,
                                  LanguageModel langFrom,
                                  LanguageModel langTo) {
+        if (text == null || langTo == null) {
+            return;
+        }
+
         // Cancel previous translation operations
         cancelTranslation();
         mChronosConnectorWrapper.runOperation(

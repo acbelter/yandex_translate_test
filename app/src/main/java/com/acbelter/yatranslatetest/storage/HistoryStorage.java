@@ -44,27 +44,47 @@ public class HistoryStorage {
     }
 
     public List<HistoryItemModel> getHistory() {
-        return new ArrayList<>(mHistory);
-    }
-
-    public List<HistoryItemModel> getHistory(boolean favorite) {
         List<HistoryItemModel> items = new ArrayList<>();
         for (HistoryItemModel item : mHistory) {
-            if (item.isFavorite == favorite) {
+            if (!item.isCleared) {
                 items.add(item);
             }
         }
         return items;
     }
 
-    public boolean hasItemsWithFavoriteState(boolean favorite) {
+    public List<HistoryItemModel> getFavorites() {
+        List<HistoryItemModel> items = new ArrayList<>();
+        for (HistoryItemModel item : mHistory) {
+            if (item.isFavorite) {
+                items.add(item);
+            }
+        }
+        return items;
+    }
+
+    public boolean hasHistoryItems() {
         if (mHistory == null || mHistory.isEmpty()) {
             return false;
         }
 
         int count = 0;
         for (int i = 0; i < mHistory.size(); i++) {
-            if (mHistory.get(i).isFavorite == favorite) {
+            if (!mHistory.get(i).isCleared) {
+                count++;
+            }
+        }
+        return count != 0;
+    }
+
+    public boolean hasFavoriteItems() {
+        if (mHistory == null || mHistory.isEmpty()) {
+            return false;
+        }
+
+        int count = 0;
+        for (int i = 0; i < mHistory.size(); i++) {
+            if (mHistory.get(i).isFavorite) {
                 count++;
             }
         }
@@ -119,40 +139,54 @@ public class HistoryStorage {
         mHistory.remove(item);
     }
 
-    public synchronized void removeItemsWithFavoriteState(boolean favorite) {
+    public synchronized void clearHistory() {
         SQLiteDatabase db = mStorageDbHelper.getWritableDatabase();
-        int count = cupboard().withDatabase(db).delete(HistoryItemModel.class,
-                "is_favorite = ?", favorite ? "1" : "0");
-        Logger.d("Delete history items: " + count);
+        cupboard().withDatabase(db).delete(HistoryItemModel.class, "is_favorite = ?", "0");
+
+        ContentValues values = new ContentValues(1);
+        values.put("ic_cleared", "1");
+        // Update only items with the opposite ic_cleared value
+        cupboard().withDatabase(db).update(HistoryItemModel.class, values, "ic_cleared = ?", "0");
         db.close();
+
         Iterator<HistoryItemModel> iterator = mHistory.iterator();
         while (iterator.hasNext()) {
             HistoryItemModel item = iterator.next();
-            if (item.isFavorite == favorite) {
+            if (!item.isFavorite) {
                 iterator.remove();
+            } else {
+                item.isCleared = true;
             }
         }
     }
 
-    public synchronized void setItemFavoriteState(HistoryItemModel item, boolean favorite) {
+    public synchronized void clearFavorites() {
+        SQLiteDatabase db = mStorageDbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues(1);
+        values.put("is_favorite", "0");
+        // Update only items with the opposite is_favorite value
+        cupboard().withDatabase(db).update(HistoryItemModel.class, values, "is_favorite = ?", "1");
+        cupboard().withDatabase(db).delete(HistoryItemModel.class, "is_favorite = ? and ic_cleared = ?", "0", "0");
+        db.close();
+
+        Iterator<HistoryItemModel> iterator = mHistory.iterator();
+        while (iterator.hasNext()) {
+            HistoryItemModel item = iterator.next();
+            if (item.isCleared) {
+                iterator.remove();
+            } else {
+                item.isFavorite = false;
+            }
+        }
+    }
+
+    public synchronized void setItemFavorite(HistoryItemModel item, boolean favorite) {
         SQLiteDatabase db = mStorageDbHelper.getWritableDatabase();
         ContentValues values = new ContentValues(1);
         values.put("is_favorite", favorite ? "1" : "0");
         cupboard().withDatabase(db).update(HistoryItemModel.class, values, "_id = ?", Long.toString(item._id));
         db.close();
         item.isFavorite = favorite;
-    }
-
-    public synchronized void setAllItemsFavoriteState(boolean favorite) {
-        SQLiteDatabase db = mStorageDbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues(1);
-        values.put("is_favorite", favorite ? "1" : "0");
-        // Update only items with the opposite is_favorite value
-        cupboard().withDatabase(db).update(HistoryItemModel.class, values, "is_favorite = ?", favorite ? "0" : "1");
-        db.close();
-        for (HistoryItemModel item : mHistory) {
-            item.isFavorite = favorite;
-        }
     }
 
     public synchronized void save(List<HistoryItemModel> history) {

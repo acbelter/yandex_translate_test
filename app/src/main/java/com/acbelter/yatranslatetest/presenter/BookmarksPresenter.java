@@ -25,21 +25,22 @@ public class BookmarksPresenter implements Presenter<BookmarksView> {
         EventBus.getDefault().post(new HistoryTranslationEvent(translation));
     }
 
-    public boolean hasNotFavoriteItems(Context context) {
-        return HistoryStorage.getInstance(context).hasItemsWithFavoriteState(false);
+    public boolean hasHistoryItems(Context context) {
+        return HistoryStorage.getInstance(context).hasHistoryItems();
     }
 
     public boolean hasFavoriteItems(Context context) {
-        return HistoryStorage.getInstance(context).hasItemsWithFavoriteState(true);
+        return HistoryStorage.getInstance(context).hasFavoriteItems();
     }
 
     public void clearHistory(Context context, BookmarksView view) {
-        HistoryStorage.getInstance(context).removeItemsWithFavoriteState(false);
+        HistoryStorage.getInstance(context).clearHistory();
         view.updateHistory();
+        view.updateFavorites();
     }
 
     public void clearFavorites(Context context, BookmarksView view) {
-        HistoryStorage.getInstance(context).setAllItemsFavoriteState(false);
+        HistoryStorage.getInstance(context).clearFavorites();
         view.updateHistory();
         view.updateFavorites();
     }
@@ -48,7 +49,7 @@ public class BookmarksPresenter implements Presenter<BookmarksView> {
                                             BookmarksView view,
                                             HistoryItemModel item,
                                             boolean favorite) {
-        HistoryStorage.getInstance(context).setItemFavoriteState(item, favorite);
+        HistoryStorage.getInstance(context).setItemFavorite(item, favorite);
         view.updateHistory();
         view.updateFavorites();
     }
@@ -57,7 +58,7 @@ public class BookmarksPresenter implements Presenter<BookmarksView> {
                                              BookmarksView view,
                                              HistoryItemModel item,
                                              boolean favorite) {
-        HistoryStorage.getInstance(context).setItemFavoriteState(item, favorite);
+        HistoryStorage.getInstance(context).setItemFavorite(item, favorite);
         view.updateHistory();
         view.updateFavorites();
     }

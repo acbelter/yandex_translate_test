@@ -24,6 +24,8 @@ public class HistoryItemModel implements Parcelable {
     public String translationText;
     @Column("is_favorite")
     public boolean isFavorite;
+    @Column("ic_cleared")
+    public boolean isCleared;
     public long timestamp;
 
     public HistoryItemModel() {}
@@ -35,6 +37,7 @@ public class HistoryItemModel implements Parcelable {
         originalText = translation.originalText;
         translationText = translation.translationText;
         isFavorite = false;
+        isCleared = false;
         timestamp = 0L;
     }
 
@@ -46,6 +49,7 @@ public class HistoryItemModel implements Parcelable {
         originalText = in.readString();
         translationText = in.readString();
         isFavorite = in.readByte() != 0;
+        isCleared = in.readByte() != 0;
         timestamp = in.readLong();
     }
 
@@ -92,6 +96,7 @@ public class HistoryItemModel implements Parcelable {
         dest.writeString(originalText);
         dest.writeString(translationText);
         dest.writeByte((byte) (isFavorite ? 1 : 0));
+        dest.writeByte((byte) (isCleared ? 1 : 0));
         dest.writeLong(timestamp);
     }
 }

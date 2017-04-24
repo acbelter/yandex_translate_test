@@ -146,7 +146,7 @@ public class BookmarksFragment extends ChronosSupportFragment implements
         final int selectedTabIndex = mTabs.getSelectedTabPosition();
         switch (selectedTabIndex) {
             case BookmarksPagerAdapter.INDEX_HISTORY:
-                if (!mPresenter.hasNotFavoriteItems(getContext())) {
+                if (!mPresenter.hasHistoryItems(getContext())) {
                     return;
                 }
                 break;

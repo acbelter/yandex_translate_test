@@ -97,7 +97,7 @@ public class TranslationPresenter implements Presenter<TranslationView> {
     public void setLanguageTo(TranslationView view, LanguageModel language) {
         mLanguageTo = language;
         view.setLanguageTo(language);
-        Pref.setRecentLangCodeFrom(mLanguageTo);
+        Pref.setRecentLangCodeTo(mLanguageTo);
     }
 
     public LanguageModel getLanguageFrom() {

@@ -211,16 +211,6 @@ public class BookmarksFragment extends ChronosSupportFragment implements
     }
 
     @Override
-    public void onHistoryItemDeleted(HistoryItemModel item) {
-
-    }
-
-    @Override
-    public void onFavoriteItemDeleted(HistoryItemModel item) {
-
-    }
-
-    @Override
     public void onHistoryItemFavoriteStateChanged(HistoryItemModel item, boolean favorite) {
         mPresenter.setHistoryItemFavoriteState(getContext(), this, item, favorite);
     }

@@ -27,7 +27,7 @@ public class Pref {
     }
 
     public static void setLanguagesLoaded(boolean loaded) {
-        sPrefs.edit().putBoolean(KEY_LANGUAGES_LOADED, loaded).apply();
+        sPrefs.edit().putBoolean(KEY_LANGUAGES_LOADED, loaded).commit();
     }
 
     public static String getRecentLangCodeFrom() {
@@ -36,7 +36,7 @@ public class Pref {
 
     public static void setRecentLangCodeFrom(LanguageModel language) {
         String code = language != null ? language.code : null;
-        sPrefs.edit().putString(KEY_RECENT_LANG_CODE_FROM, code).apply();
+        sPrefs.edit().putString(KEY_RECENT_LANG_CODE_FROM, code).commit();
     }
 
     public static String getRecentLangCodeTo() {
@@ -45,7 +45,7 @@ public class Pref {
 
     public static void setRecentLangCodeTo(LanguageModel language) {
         String code = language != null ? language.code : null;
-        sPrefs.edit().putString(KEY_RECENT_LANG_CODE_TO, code).apply();
+        sPrefs.edit().putString(KEY_RECENT_LANG_CODE_TO, code).commit();
     }
 
     public static boolean isDetectLang() {
@@ -53,6 +53,6 @@ public class Pref {
     }
 
     public static void setDetectLang(boolean detect) {
-        sPrefs.edit().putBoolean(KEY_DETECT_LANG, detect).apply();
+        sPrefs.edit().putBoolean(KEY_DETECT_LANG, detect).commit();
     }
 }

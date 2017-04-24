@@ -358,6 +358,9 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
 
     public void onEvent(HistoryTranslationEvent event) {
         Logger.d(getClass(), "History translation event");
+        LanguageStorage languageStorage = LanguageStorage.getInstance(getContext());
+        mPresenter.setLanguageFrom(this, languageStorage.getLanguageByCode(event.getTranslation().langFromCode));
+        mPresenter.setLanguageTo(this, languageStorage.getLanguageByCode(event.getTranslation().langToCode));
         showTranslation(event.getTranslation());
     }
 

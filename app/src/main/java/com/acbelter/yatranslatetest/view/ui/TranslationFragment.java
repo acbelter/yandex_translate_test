@@ -283,22 +283,12 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     }
 
     @Override
-    public void showTranslationFail() {
+    public void showTranslationFail(int textResId) {
         mTranslationProgress.setVisibility(View.INVISIBLE);
         mTranslationText.setText(null);
         mDetectedLanguageText.setText(null);
         mDetectedLanguageText.setVisibility(View.GONE);
-        if (!getOriginalText().isEmpty()) {
-            Toast.makeText(getContext().getApplicationContext(),
-                    R.string.toast_translation_fail, Toast.LENGTH_SHORT).show();
-            // Повторная попытка перевода при ошибке
-            mUiHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mPresenter.startTranslation(TranslationFragment.this, getOriginalText());
-                }
-            }, 2000L);
-        }
+        Toast.makeText(getContext().getApplicationContext(), textResId, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -367,8 +357,9 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
      */
     public void onOperationFinished(TranslateOperation.Result result) {
         Logger.d("Translation operation is finished");
-        TranslationModel translation = !result.getOperation().isCancelled() ? result.getOutput() : null;
-        mPresenter.finishTranslation(this, translation);
+        if (!result.getOperation().isCancelled()) {
+            mPresenter.finishTranslation(this, getOriginalText(), result.getOutput());
+        }
     }
 
     public void onEvent(HistoryTranslationEvent event) {

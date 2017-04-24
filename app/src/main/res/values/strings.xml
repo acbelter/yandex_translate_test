@@ -15,7 +15,8 @@
     <string name="license_text">Powered by Yandex.Translate</string>
     <string name="license_url">http://translate.yandex.ru/</string>
     <string name="detected_language">Detected language: %1$s</string>
-    <string name="toast_translation_fail">Unable to translate text</string>
+    <string name="toast_translation_fail">Fail to translate text</string>
+    <string name="toast_too_long_text">Original text is too long</string>
 
     <!--Bookmarks screen-->
     <string name="history">History</string>

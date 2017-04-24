@@ -6,19 +6,21 @@ package com.acbelter.yatranslatetest.operation;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import com.acbelter.yatranslatetest.Cache;
 import com.acbelter.yatranslatetest.MainApplication;
 import com.acbelter.yatranslatetest.Pref;
 import com.acbelter.yatranslatetest.model.LanguageModel;
 import com.acbelter.yatranslatetest.model.TranslationModel;
+import com.acbelter.yatranslatetest.network.ApiCode;
 import com.acbelter.yatranslatetest.network.NetworkClient;
 import com.acbelter.yatranslatetest.network.Parser;
 import com.acbelter.yatranslatetest.network.YandexTranslateApi;
 import com.acbelter.yatranslatetest.util.Logger;
 import com.redmadrobot.chronos.ChronosOperation;
 import com.redmadrobot.chronos.ChronosOperationResult;
+
+import org.json.JSONException;
 
 import java.io.IOException;
 
@@ -45,10 +47,6 @@ public class TranslateOperation extends ChronosOperation<TranslationModel> {
     @Nullable
     @Override
     public TranslationModel run() {
-        if (TextUtils.isEmpty(mText)) {
-            return null;
-        }
-
         // Для тестирования: симуляция медленного сетевого соединения
         if (MainApplication.SIMULATE_SLOW_NETWORK) {
             try {
@@ -74,27 +72,29 @@ public class TranslateOperation extends ChronosOperation<TranslationModel> {
                     .build();
 
             response = client.newCall(request).execute();
-            if (!response.isSuccessful()) {
-                throw new IOException("Unexpected response code while text translation. Body: "
-                        + response.body().string());
+            int code = response.code();
+            Logger.d("Translation response code: " + response.code());
+            if (code != ApiCode.CODE_OK) {
+                // Если запрос прошел и выскочила ошибка серевера, то возвращаем перевод с кодом ошибки
+                Logger.d("Unexpected response code while text translation. Body: " + response.body().string());
+                return new TranslationModel(code);
             }
 
             Logger.d("Translation response from cache: " + (response.cacheResponse() != null));
 
             String data = response.body().string();
-            Logger.d("Translation: " + data);
+            Logger.d("Translation data: " + data);
             TranslationModel translation = Parser.parseTranslation(data);
-            if (translation.code == 200) {
-                // Сохраняем язык перевода и оригинальный текст для отображения истории
-                translation.langFromCode = mLangFromCode;
-                translation.originalText = mText;
-                return translation;
-            }
-
-            return null;
-        } catch (Exception e) {
+            // Сохраняем язык перевода и оригинальный текст для отображения истории
+            translation.langFromCode = mLangFromCode;
+            translation.originalText = mText;
+            return translation;
+        } catch (IOException e) {
             Logger.printStackTrace(e);
             return null;
+        } catch (JSONException e) {
+            Logger.printStackTrace(e);
+            return new TranslationModel(ApiCode.CODE_SERVER_ERROR);
         } finally {
             if (response != null) {
                 response.body().close();

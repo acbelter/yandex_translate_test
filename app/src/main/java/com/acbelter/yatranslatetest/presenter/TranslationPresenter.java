@@ -5,19 +5,25 @@
 package com.acbelter.yatranslatetest.presenter;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 
 import com.acbelter.yatranslatetest.Pref;
+import com.acbelter.yatranslatetest.R;
 import com.acbelter.yatranslatetest.RequestConstants;
 import com.acbelter.yatranslatetest.interactor.Interactor;
 import com.acbelter.yatranslatetest.model.HistoryItemModel;
 import com.acbelter.yatranslatetest.model.LanguageModel;
 import com.acbelter.yatranslatetest.model.TranslationModel;
+import com.acbelter.yatranslatetest.network.ApiCode;
 import com.acbelter.yatranslatetest.storage.HistoryStorage;
 import com.acbelter.yatranslatetest.storage.LanguageStorage;
+import com.acbelter.yatranslatetest.util.Logger;
 import com.acbelter.yatranslatetest.view.TranslationView;
 import com.acbelter.yatranslatetest.view.ui.SelectLangActivity;
+
+import java.lang.ref.WeakReference;
 
 import de.greenrobot.event.EventBus;
 
@@ -121,20 +127,66 @@ public class TranslationPresenter implements Presenter<TranslationView> {
         mInteractor.cancelTranslation();
     }
 
-    public void finishTranslation(TranslationView view, TranslationModel translation) {
+    public void finishTranslation(TranslationView view, final String text, TranslationModel translation) {
         mCurrentTranslation = translation;
-        if (translation != null) {
-            view.showTranslation(translation);
+        if (translation == null) {
+            final WeakReference<Interactor> interactorWeakRef = new WeakReference<>(mInteractor);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Interactor interactor = interactorWeakRef.get();
+                    if (interactor != null) {
+                        interactor.startTranslation(text, mLanguageFrom, mLanguageTo);
+                    }
+                }
+            }, 3000L);
+            return;
+        }
 
-            // Сохраняем полученный перевод в историю
-            HistoryItemModel historyItem = new HistoryItemModel(translation);
-            historyItem.timestamp = System.currentTimeMillis();
-            mHistoryStorage.saveItem(historyItem);
+        if (translation.code != ApiCode.CODE_OK) {
+            clearTranslation(view);
+        }
 
-            // FIXME Небольшой хак: рассылаем event для обновления истории
-            EventBus.getDefault().post(new HistoryUpdatedEvent());
-        } else {
-            view.showTranslationFail();
+        Logger.d("Finish translation with code: " + translation.code);
+        switch (translation.code) {
+            case ApiCode.CODE_OK:
+                view.showTranslation(translation);
+
+                // Сохраняем полученный перевод в историю
+                HistoryItemModel historyItem = new HistoryItemModel(translation);
+                historyItem.timestamp = System.currentTimeMillis();
+                mHistoryStorage.saveItem(historyItem);
+
+                // FIXME Небольшой хак: рассылаем event для обновления истории
+                EventBus.getDefault().post(new HistoryUpdatedEvent());
+                break;
+            case ApiCode.CODE_API_KEY_INVALID:
+                view.showTranslationFail(R.string.toast_translation_fail);
+                break;
+            case ApiCode.CODE_API_KEY_BLOCKED:
+                view.showTranslationFail(R.string.toast_translation_fail);
+                break;
+            case ApiCode.CODE_LIMIT_EXCEEDED:
+                view.showTranslationFail(R.string.toast_translation_fail);
+                break;
+            case ApiCode.CODE_MAX_TEXT_LIMIT:
+                view.showTranslationFail(R.string.toast_too_long_text);
+                break;
+            case ApiCode.CODE_MAX_URL_LIMIT:
+                view.showTranslationFail(R.string.toast_too_long_text);
+                break;
+            case ApiCode.CODE_UNABLE_TO_TRANSLATE:
+                view.showTranslationFail(R.string.toast_translation_fail);
+                break;
+            case ApiCode.CODE_UNSUPPORTED_TRANSLATE_DIRECTION:
+                view.showTranslationFail(R.string.toast_translation_fail);
+                break;
+            case ApiCode.CODE_SERVER_ERROR:
+                view.showTranslationFail(R.string.toast_translation_fail);
+                break;
+            default:
+                view.showTranslationFail(R.string.toast_translation_fail);
+                break;
         }
     }
 

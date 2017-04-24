@@ -13,5 +13,5 @@ public interface TranslationView extends PresenterView {
     void setLanguageTo(LanguageModel language);
     void showTranslationProcess();
     void showTranslation(TranslationModel translation);
-    void showTranslationFail();
+    void showTranslationFail(int textResId);
 }

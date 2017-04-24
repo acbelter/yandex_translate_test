@@ -18,7 +18,12 @@ public class YandexTranslateApi {
     public static final String FORMAT_PLAIN = "plain";
     public static final String FORMAT_HTML = "html";
 
-    // See https://tech.yandex.ru/translate/doc/dg/reference/getLangs-docpage/
+    /**
+     * Создание URL для получения списка поддерживаемых языков
+     * @see <a href="https://tech.yandex.ru/translate/doc/dg/reference/getLangs-docpage/">Yandex.Translate API</a>
+     * @param ui
+     * @return
+     */
     public static HttpUrl buildGetLanguagesUrl(String ui) {
         return BASE_URL.newBuilder()
                 .addPathSegment("getLangs")
@@ -27,7 +32,16 @@ public class YandexTranslateApi {
                 .build();
     }
 
-    // See https://tech.yandex.ru/translate/doc/dg/reference/translate-docpage/
+    /**
+     * Создание URL для перевода текста
+     * @see <a href="https://tech.yandex.ru/translate/doc/dg/reference/translate-docpage/">Yandex.Translate API</a>
+     * @param text
+     * @param langFromCode
+     * @param langToCode
+     * @param format
+     * @return
+     * @throws MalformedURLException
+     */
     public static HttpUrl buildTranslateUrl(String text,
                                             String langFromCode,
                                             String langToCode,

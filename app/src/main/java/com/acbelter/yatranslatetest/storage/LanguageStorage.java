@@ -19,10 +19,14 @@ import nl.qbusict.cupboard.QueryResultIterable;
 
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
+/**
+ * Хранилище списка поддерживаемых языков
+ */
 public class LanguageStorage {
     private static LanguageStorage sInstance;
 
     private StorageDbHelper mStorageDbHelper;
+    // Кеш данных в оперативной памяти
     private List<LanguageModel> mLanguages;
 
     private LanguageStorage(Context context) {
@@ -58,6 +62,9 @@ public class LanguageStorage {
         return null;
     }
 
+    /**
+     * Загрузка списка поддерживаемых языков из БД в оперативную память
+     */
     public synchronized void load() {
         SQLiteDatabase db = mStorageDbHelper.getReadableDatabase();
         Cursor cursor = cupboard()
@@ -68,6 +75,7 @@ public class LanguageStorage {
                     cupboard().withCursor(cursor).iterate(LanguageModel.class);
             List<LanguageModel> languages = iterable.list(true);
 
+            // Сортировка списка языков по их описаниям
             Collections.sort(languages, new Comparator<LanguageModel>() {
                 @Override
                 public int compare(LanguageModel lang1, LanguageModel lang2) {
@@ -86,6 +94,10 @@ public class LanguageStorage {
         }
     }
 
+    /**
+     * Сохранение списка поддерживаемых языков в БД
+     * @param languages Сохраняемый список поддерживаемых языков
+     */
     public synchronized void save(List<LanguageModel> languages) {
         SQLiteDatabase db = mStorageDbHelper.getWritableDatabase();
         cupboard().withDatabase(db).delete(LanguageModel.class, null);

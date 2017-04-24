@@ -30,6 +30,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * Класс асинхронной операции для загрузки данных
+ */
 public class InitDataOperation extends ChronosOperation<Boolean> {
     private LanguageStorage mLanguageStorage;
     private HistoryStorage mHistoryStorage;
@@ -42,17 +45,19 @@ public class InitDataOperation extends ChronosOperation<Boolean> {
     @Nullable
     @Override
     public Boolean run() {
-        // For testing: simulate slow network connection
+        // Для тестирования: симуляция медленного сетевого соединения
         if (MainApplication.SIMULATE_SLOW_NETWORK) {
             try {
                 Thread.sleep(MainApplication.SLOW_NETWORK_DELAY);
             } catch (InterruptedException e) {
-                // Ignore
+                // Игнорируем
             }
         }
 
         mHistoryStorage.load();
 
+        // Если список языков уже загружен в локальное хранилище, то загружаем его оттуда
+        // В противном случае загружаем его из сети и сохраняем в локальное хранилище
         if (Pref.isLanguagesLoaded()) {
             mLanguageStorage.load();
         } else {
@@ -70,10 +75,10 @@ public class InitDataOperation extends ChronosOperation<Boolean> {
         }
 
         try {
-            // Prevents instant screen hiding
+            // Пауза для предотвращения мгновенного исчезновения сплеш-скрина
             Thread.sleep(500);
         } catch (InterruptedException e) {
-            // Ignore
+            // Игнорируем
         }
 
         return true;
@@ -84,7 +89,7 @@ public class InitDataOperation extends ChronosOperation<Boolean> {
 
         Request request = new Request.Builder()
                 .cacheControl(new CacheControl.Builder().noCache().build())
-                // TODO Detect language code by current locale
+                // TODO Определять язык описания по текущей локале, а не использовать en
                 .url(YandexTranslateApi.buildGetLanguagesUrl("en"))
                 .build();
 

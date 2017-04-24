@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         PresentersHub.attach(getSupportFragmentManager());
 
+        // Скрываем клавиатуру при первом запуске и в дальнейшем отображаем ее поверх UI
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN|
                 WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
 
@@ -64,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         mTabs.getTabAt(MainPagerAdapter.INDEX_TRANSLATION).setIcon(mTranslationSelectedDrawable);
         mTabs.getTabAt(MainPagerAdapter.INDEX_BOOKMARKS).setIcon(mBookmarksDrawable);
 
+        // Если история либо список поддерживаемых языков не загружен,
+        // то показываем сплеш-скрин и загружаем необходимые данные
         if (!LanguageStorage.getInstance(this).isLanguagesLoaded() ||
                 !HistoryStorage.getInstance(this).isHistoryLoaded()) {
             Intent intent = new Intent(MainActivity.this, SplashActivity.class);
@@ -117,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     public void onEvent(HistoryTranslationEvent event) {
         Logger.d(getClass(), "History translation event");
+        // При событии показы элемента из истории переходим к окну с переводом
         mContentViewPager.setCurrentItem(MainPagerAdapter.INDEX_TRANSLATION);
     }
 }

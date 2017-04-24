@@ -7,9 +7,12 @@ package com.acbelter.yatranslatetest.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * Класс, описывающий язык перевода
+ */
 public class LanguageModel implements Parcelable {
-    // cupboard needs the fields to be public
-    public Long _id;    // field for cupboard
+    // cupboard требует, чтобы поля были public
+    public Long _id;    // поле, необходимое для cupboard
     public String code;
     public String label;
 

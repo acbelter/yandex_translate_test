@@ -4,6 +4,9 @@
 
 package com.acbelter.yatranslatetest;
 
+/**
+ * Конатанты, используемые пре пересылке данных
+ */
 public class RequestConstants {
     public static final int REQUEST_CODE_SPLASH = 0;
     public static final int REQUEST_CODE_SELECT_LANG_FROM = 1;

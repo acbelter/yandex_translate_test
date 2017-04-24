@@ -6,6 +6,9 @@ package com.acbelter.yatranslatetest.presenter;
 
 import com.acbelter.yatranslatetest.model.TranslationModel;
 
+/**
+ * Событие показа элемента из истории
+ */
 public class HistoryTranslationEvent {
     private TranslationModel mTranslation;
 

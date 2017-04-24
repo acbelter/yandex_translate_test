@@ -67,20 +67,12 @@ public class LanguagesAdapter extends ArrayAdapter<LanguageModel> {
         return convertView;
     }
 
-    /**
-     * @param language Language for selection
-     * @return Selected language position or -1
-     */
     public int selectLanguage(LanguageModel language) {
         mSelectedLanguage = language;
         notifyDataSetChanged();
         return mLanguages.indexOf(mSelectedLanguage);
     }
 
-    /**
-     * @param code Language code for selection
-     * @return Selected language or null
-     */
     public LanguageModel selectLangForCode(String code) {
         if (code == null) {
             mSelectedLanguage = null;
@@ -98,10 +90,6 @@ public class LanguagesAdapter extends ArrayAdapter<LanguageModel> {
         return null;
     }
 
-    /**
-     * @param position Position for selection
-     * @return Selected language
-     */
     public LanguageModel selectLangForPosition(int position) {
         mSelectedLanguage = mLanguages.get(position);
         notifyDataSetChanged();

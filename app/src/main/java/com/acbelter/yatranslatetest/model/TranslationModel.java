@@ -7,6 +7,9 @@ package com.acbelter.yatranslatetest.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * Класс, описывающие перевод
+ */
 public class TranslationModel implements Parcelable {
     public int code;
     public String detectedLangCode;

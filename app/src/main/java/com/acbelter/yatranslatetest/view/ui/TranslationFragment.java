@@ -76,12 +76,13 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     private Unbinder mUnbinder;
 
     private TextWatcher mOriginalTextWatcher;
+    // Флаг, показывающий, добавлен ли наблюдатель изменения текста оригинала или нет
     private boolean mOriginalTextWatcherAdded;
 
     private PresentersHub mPresentersHub = PresentersHub.getInstance();
 
     private TranslationPresenter mPresenter;
-    // Rotate swap button clockwise or not
+    // Флаг, определяющий направление поворота кнопки смены языков перевода
     private boolean mSwapRotateClockwise = true;
 
     private Handler mUiHandler;
@@ -102,8 +103,10 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
             mPresenter = new TranslationPresenter(languageStorage, historyStorage);
             mPresentersHub.addPresenter(mPresenter);
         } else {
+            // Получение презентера по сохраненному id из хаба презентеров
             PresenterId id = savedInstanceState.getParcelable(Presenter.KEY_PRESENTER_ID);
             mPresenter = (TranslationPresenter) mPresentersHub.getPresenterById(id);
+            // Если в хабе почему-то нет презентера с таким id, то создадим новый презентер
             if (mPresenter == null) {
                 mPresenter = new TranslationPresenter(languageStorage, historyStorage);
                 mPresentersHub.addPresenter(mPresenter);
@@ -134,7 +137,7 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
         Utils.tintIndeterminateProgressBar(mTranslationProgress);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            // Previous versions are not support ripple effect
+            // Предыдущие версии Android не поддерживают Ripple Effect
             mLangFromText.setBackgroundResource(0);
             mLangToText.setBackgroundResource(0);
             mBtnSwapLangs.setBackgroundResource(0);
@@ -144,6 +147,7 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
         mOriginalEditText.setRawInputType(InputType.TYPE_CLASS_TEXT);
 
         mOriginalTextWatcher = new TextWatcher() {
+            // Задержка перед началом перевода текста после его изменения
             private final long DELAY = 1000L;
             private Timer mTimer = new Timer();
 
@@ -203,6 +207,7 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
         EventBus.getDefault().register(this);
         mPresenter.present(this);
 
+        // Предотвращение добавления наблюдателя несколько раз
         if (!mOriginalTextWatcherAdded) {
             mOriginalEditText.addTextChangedListener(mOriginalTextWatcher);
             mOriginalTextWatcherAdded = true;
@@ -286,8 +291,8 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
         if (!getOriginalText().isEmpty()) {
             Toast.makeText(getContext().getApplicationContext(),
                     R.string.toast_translation_fail, Toast.LENGTH_SHORT).show();
-            // Retry text translation
-            new Handler().postDelayed(new Runnable() {
+            // Повторная попытка перевода при ошибке
+            mUiHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     mPresenter.startTranslation(TranslationFragment.this, getOriginalText());
@@ -300,6 +305,12 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
     public void onDestroyView() {
         super.onDestroyView();
         mUnbinder.unbind();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mUiHandler.removeCallbacksAndMessages(null);
     }
 
     @OnClick(R.id.lang_from_label)
@@ -350,6 +361,10 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
         mBtnClear.setVisibility(View.INVISIBLE);
     }
 
+    /**
+     * Callback-метод библиотеки Chronos, вызываемый при завершении соответствующей операции
+     * @param result Результат операции
+     */
     public void onOperationFinished(TranslateOperation.Result result) {
         Logger.d("Translation operation is finished");
         TranslationModel translation = !result.getOperation().isCancelled() ? result.getOutput() : null;
@@ -358,6 +373,7 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
 
     public void onEvent(HistoryTranslationEvent event) {
         Logger.d(getClass(), "History translation event");
+        // При получении события показа перевода из истории отображаем его в UI
         LanguageStorage languageStorage = LanguageStorage.getInstance(getContext());
         mPresenter.setLanguageFrom(this, languageStorage.getLanguageByCode(event.getTranslation().langFromCode));
         mPresenter.setLanguageTo(this, languageStorage.getLanguageByCode(event.getTranslation().langToCode));
@@ -366,7 +382,9 @@ public class TranslationFragment extends ChronosSupportFragment implements Trans
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Необходимо установить interactor, т.к. onActivityResult() вызывается до onResume()
         mPresenter.setInteractor(new ChronosInteractor(this));
+        // При смене языка запускаем перевод текста
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == RequestConstants.REQUEST_CODE_SELECT_LANG_FROM) {
                 LanguageModel language = data.getParcelableExtra(RequestConstants.KEY_LANG);

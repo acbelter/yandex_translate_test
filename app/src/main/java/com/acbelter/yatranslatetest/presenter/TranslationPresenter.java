@@ -44,18 +44,17 @@ public class TranslationPresenter implements Presenter<TranslationView> {
     public void initLanguages(TranslationView view) {
         String fromCode = Pref.getRecentLangCodeFrom();
         String toCode = Pref.getRecentLangCodeTo();
-        // No recent language
+        // Если нет сохраненного языка, то используем английский язык
         if (fromCode == null) {
-            // TODO Detect language code by current locale
             fromCode = "en";
         }
 
         mLanguageFrom = mLanguageStorage.getLanguageByCode(fromCode);
         Pref.setRecentLangCodeFrom(mLanguageFrom);
 
-        // No recent language
+        // Если нет сохраненного языка, то используем дефолное значение
         if (toCode == null) {
-            // TODO Detect language code by current locale
+            // TODO Определять язык по текущей локале
             toCode = "ru";
         }
 
@@ -127,11 +126,12 @@ public class TranslationPresenter implements Presenter<TranslationView> {
         if (translation != null) {
             view.showTranslation(translation);
 
+            // Сохраняем полученный перевод в историю
             HistoryItemModel historyItem = new HistoryItemModel(translation);
             historyItem.timestamp = System.currentTimeMillis();
             mHistoryStorage.saveItem(historyItem);
 
-            // FIXME Small hack: post event to update history
+            // FIXME Небольшой хак: рассылаем event для обновления истории
             EventBus.getDefault().post(new HistoryUpdatedEvent());
         } else {
             view.showTranslationFail();

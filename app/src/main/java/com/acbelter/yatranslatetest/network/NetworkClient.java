@@ -21,7 +21,8 @@ public class NetworkClient {
         public Response intercept(Interceptor.Chain chain) throws IOException {
             Response originalResponse = chain.proceed(chain.request());
             return originalResponse.newBuilder()
-                    .header("Cache-Control", "max-age=" + 60 * 60 * 24) // 1 day
+                    // Кешировать данные на 1 день
+                    .header("Cache-Control", "max-age=" + 60 * 60 * 24)
                     .build();
         }
     };
@@ -41,7 +42,7 @@ public class NetworkClient {
 
         Cache cache = null;
         try {
-            cache = new Cache(new File(cacheDir, "yacache"), 2 * 1024 * 1024);  // 2 MB
+            cache = new Cache(new File(cacheDir, "yacache"), 2 * 1024 * 1024);  // 2 Мб
         } catch (Exception e) {
             Logger.d("Could not create cache");
         }

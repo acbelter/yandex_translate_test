@@ -62,8 +62,10 @@ public class BookmarksFragment extends ChronosSupportFragment implements
             mPresenter = new BookmarksPresenter();
             mPresentersHub.addPresenter(mPresenter);
         } else {
+            // Получение презентера по сохраненному id из хаба презентеров
             PresenterId id = savedInstanceState.getParcelable(Presenter.KEY_PRESENTER_ID);
             mPresenter = (BookmarksPresenter) mPresentersHub.getPresenterById(id);
+            // Если в хабе почему-то нет презентера с таким id, то создадим новый презентер
             if (mPresenter == null) {
                 mPresenter = new BookmarksPresenter();
                 mPresentersHub.addPresenter(mPresenter);
@@ -137,6 +139,7 @@ public class BookmarksFragment extends ChronosSupportFragment implements
     }
 
     public void onEvent(HistoryUpdatedEvent event) {
+        // По событию обновляем историю и избранное
         updateHistory();
         updateFavorites();
     }
@@ -195,6 +198,7 @@ public class BookmarksFragment extends ChronosSupportFragment implements
         AlertDialog dialog = builder.create();
         dialog.show();
 
+        // Покраска кнопок диалога
         int buttonsColor = ContextCompat.getColor(getContext(), R.color.colorMainDark);
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(buttonsColor);
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(buttonsColor);

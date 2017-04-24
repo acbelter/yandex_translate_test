@@ -30,8 +30,10 @@ public class SplashActivity extends ChronosAppCompatActivity implements SplashVi
             mPresenter = new SplashPresenter();
             mPresentersHub.addPresenter(mPresenter);
         } else {
+            // Получение презентера по сохраненному id из хаба презентеров
             PresenterId id = savedInstanceState.getParcelable(Presenter.KEY_PRESENTER_ID);
             mPresenter = (SplashPresenter) mPresentersHub.getPresenterById(id);
+            // Если в хабе почему-то нет презентера с таким id, то создадим новый презентер
             if (mPresenter == null) {
                 mPresenter = new SplashPresenter();
                 mPresentersHub.addPresenter(mPresenter);
@@ -60,6 +62,7 @@ public class SplashActivity extends ChronosAppCompatActivity implements SplashVi
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // Удаляем презентер из хаба, т.к. он больше не требуется
         mPresentersHub.removePresenterById(mPresenter.getId());
     }
 
@@ -70,6 +73,10 @@ public class SplashActivity extends ChronosAppCompatActivity implements SplashVi
                 mPresentersHub.getIdForPresenter(mPresenter));
     }
 
+    /**
+     * Callback-метод библиотеки Chronos, вызываемый при завершении соответствующей операции
+     * @param result Результат операции
+     */
     public void onOperationFinished(InitDataOperation.Result result) {
         mPresenter.finishDataInitialization(this, this, result.getOutput());
     }
@@ -82,7 +89,7 @@ public class SplashActivity extends ChronosAppCompatActivity implements SplashVi
     @Override
     public void finish() {
         super.finish();
-        // Override activity animation
+        // Переопределение анимации activity
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 }

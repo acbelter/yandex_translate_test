@@ -9,9 +9,12 @@ import android.os.Parcelable;
 
 import nl.qbusict.cupboard.annotation.Column;
 
+/**
+ * Класс, описывающий элемент истории и избранного
+ */
 public class HistoryItemModel implements Parcelable {
-    // cupboard needs the fields to be public
-    public Long _id;    // field for cupboard
+    // cupboard требует, чтобы поля были public
+    public Long _id;    // поле, необходимое для cupboard
     @Column("detected_lang_code")
     public String detectedLangCode;
     @Column("lang_from_code")
@@ -23,8 +26,12 @@ public class HistoryItemModel implements Parcelable {
     @Column("translation_text")
     public String translationText;
     @Column("is_favorite")
+    // Флаг, показывающий, находится ли элемент в избранном или нет
     public boolean isFavorite;
     @Column("ic_cleared")
+    // Флаг, показывающий, был ли элемент из истории очищен.
+    // Данный флаг необходим, т.к. в избранном могут находиться элементы,
+    // удаленные из истории
     public boolean isCleared;
     public long timestamp;
 

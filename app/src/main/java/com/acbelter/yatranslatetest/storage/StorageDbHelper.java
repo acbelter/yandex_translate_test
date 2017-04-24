@@ -13,6 +13,9 @@ import com.acbelter.yatranslatetest.model.LanguageModel;
 
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
+/**
+ * Вспомогательный класс для работы с БД
+ */
 public class StorageDbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "yateststorage.db";
     private static final int DATABASE_VERSION = 1;
@@ -33,8 +36,7 @@ public class StorageDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // This will upgrade tables, adding columns and new tables.
-        // Note that existing columns will not be converted.
+        // Существующие столбцы не будут преобразованы при обновлении структуры БД
         cupboard().withDatabase(db).upgradeTables();
     }
 }

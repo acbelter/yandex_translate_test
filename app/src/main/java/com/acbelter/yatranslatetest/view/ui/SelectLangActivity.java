@@ -69,9 +69,11 @@ public class SelectLangActivity extends AppCompatActivity implements SelectLangV
             mPresenter = new SelectLangPresenter(LanguageStorage.getInstance(this), mSelectLangMode);
             mPresentersHub.addPresenter(mPresenter);
         } else {
+            // Получение презентера по сохраненному id из хаба презентеров
             PresenterId id = savedInstanceState.getParcelable(Presenter.KEY_PRESENTER_ID);
             mSelectLangMode = SelectLangMode.valueOf(savedInstanceState.getString("select_lang_mode"));
             mPresenter = (SelectLangPresenter) mPresentersHub.getPresenterById(id);
+            // Если в хабе почему-то нет презентера с таким id, то создадим новый презентер
             if (mPresenter == null) {
                 mPresenter = new SelectLangPresenter(LanguageStorage.getInstance(this), mSelectLangMode);
                 mPresentersHub.addPresenter(mPresenter);
@@ -110,6 +112,7 @@ public class SelectLangActivity extends AppCompatActivity implements SelectLangV
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // Удаляем презентер из хаба, т.к. он больше не требуется
         mPresentersHub.removePresenterById(mPresenter.getId());
     }
 

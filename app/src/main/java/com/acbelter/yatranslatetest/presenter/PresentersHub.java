@@ -11,8 +11,12 @@ import android.util.SparseArray;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Хаб презентеров для хранения презенторов, добавления и получения презентера по его id.
+ * У каждого хаба презентеров есть свой уникальный идентификатор7
+ */
 public class PresentersHub {
-    private static PresentersHub sInstance = new PresentersHub();
+    private static PresentersHub sInstance;
 
     private UUID mHubId;
     private AtomicInteger mPresenterIdGenerator;
@@ -25,6 +29,9 @@ public class PresentersHub {
     }
 
     public static PresentersHub getInstance() {
+        if (sInstance == null) {
+            sInstance = new PresentersHub();
+        }
         return sInstance;
     }
 
@@ -35,12 +42,11 @@ public class PresentersHub {
     public PresenterId getIdForPresenter(Presenter presenter) {
         return new PresenterId(mHubId, presenter.getId());
     }
-
     /**
-     * Add presenter to hub if it isn't there and return it's id.
-     * If presenter is already in hub, just returns it's id.
-     * @param presenter Presenter to add
-     * @return Presenter id in hub or -1
+     * Добавление презентера в хаб если его там еще нет и получение его id
+     * Если презентер уже находится в хабе, то просто возвращается его id
+     * @param presenter Презентер нужно добавить в хаб
+     * @return Идентификатор презентера в хабе
      */
     public int addPresenter(Presenter presenter) {
         if (presenter == null) {
@@ -75,6 +81,10 @@ public class PresentersHub {
         mIdPresenterMap.remove(presenterId);
     }
 
+    /**
+     * Прикрепление презентера к FragmentManager с помощью retain-фрагмента для его сохранения
+     * @param fragmentManager
+     */
     public static void attach(FragmentManager fragmentManager) {
         PresentersHubHolderFragment holderFragment =
                 (PresentersHubHolderFragment) fragmentManager

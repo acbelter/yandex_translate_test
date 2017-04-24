@@ -21,7 +21,7 @@ public class BookmarksPresenter implements Presenter<BookmarksView> {
 
     public void showTranslationFromHistory(HistoryItemModel item) {
         TranslationModel translation = new TranslationModel(item);
-        // FIXME Small hack: post event to show translation
+        // FIXME Небольшой хак: рассылаем event для обновления ui
         EventBus.getDefault().post(new HistoryTranslationEvent(translation));
     }
 

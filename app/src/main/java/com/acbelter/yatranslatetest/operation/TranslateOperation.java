@@ -26,6 +26,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * Класс асинхронной операции для перевода текста
+ */
 public class TranslateOperation extends ChronosOperation<TranslationModel> {
     private String mText;
     private String mLangFromCode;
@@ -46,7 +49,7 @@ public class TranslateOperation extends ChronosOperation<TranslationModel> {
             return null;
         }
 
-        // For testing: simulate slow network connection
+        // Для тестирования: симуляция медленного сетевого соединения
         if (MainApplication.SIMULATE_SLOW_NETWORK) {
             try {
                 Thread.sleep(MainApplication.SLOW_NETWORK_DELAY);
@@ -62,6 +65,8 @@ public class TranslateOperation extends ChronosOperation<TranslationModel> {
 //            RequestBody requestBody =
 //                    RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"), "text=" + mText);
             String requestLangFromCode = Pref.isDetectLang() ? null : mLangFromCode;
+            // Используется GET-запрос, т.к. он легко кешируется с помощью okhttp
+            // TODO Использовать POST-запрос и написать собственный кеш для кеширования POST-запросов
             Request request = new Request.Builder()
                     .url(YandexTranslateApi.buildTranslateUrl(
                             mText, requestLangFromCode, mLangToCode, YandexTranslateApi.FORMAT_PLAIN))
@@ -80,6 +85,7 @@ public class TranslateOperation extends ChronosOperation<TranslationModel> {
             Logger.d("Translation: " + data);
             TranslationModel translation = Parser.parseTranslation(data);
             if (translation.code == 200) {
+                // Сохраняем язык перевода и оригинальный текст для отображения истории
                 translation.langFromCode = mLangFromCode;
                 translation.originalText = mText;
                 return translation;

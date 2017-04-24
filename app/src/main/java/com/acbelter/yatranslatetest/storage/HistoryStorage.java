@@ -22,10 +22,14 @@ import nl.qbusict.cupboard.QueryResultIterable;
 
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
+/**
+ * Хранилище истории и избранного
+ */
 public class HistoryStorage {
     private static HistoryStorage sInstance;
 
     private StorageDbHelper mStorageDbHelper;
+    // Кеш данных в оперативной памяти
     private List<HistoryItemModel> mHistory;
 
     private HistoryStorage(Context context) {
@@ -44,6 +48,7 @@ public class HistoryStorage {
     }
 
     public List<HistoryItemModel> getHistory() {
+        // В историю входят те элементы, который не были когда-то удалены из нее
         List<HistoryItemModel> items = new ArrayList<>();
         for (HistoryItemModel item : mHistory) {
             if (!item.isCleared) {
@@ -54,6 +59,7 @@ public class HistoryStorage {
     }
 
     public List<HistoryItemModel> getFavorites() {
+        // В избранное входят элементы истории, помеченные соответствующим флагом
         List<HistoryItemModel> items = new ArrayList<>();
         for (HistoryItemModel item : mHistory) {
             if (item.isFavorite) {
@@ -91,6 +97,9 @@ public class HistoryStorage {
         return count != 0;
     }
 
+    /**
+     * Загрузка истории из БД в оперативную память
+     */
     public synchronized void load() {
         SQLiteDatabase db = mStorageDbHelper.getWritableDatabase();
         Cursor cursor = cupboard()
@@ -101,6 +110,7 @@ public class HistoryStorage {
                     cupboard().withCursor(cursor).iterate(HistoryItemModel.class);
             List<HistoryItemModel> history = iterable.list(true);
 
+            // Сортируем историю по timestamp
             Collections.sort(history, new Comparator<HistoryItemModel>() {
                 @Override
                 public int compare(HistoryItemModel h1, HistoryItemModel h2) {
@@ -125,6 +135,10 @@ public class HistoryStorage {
         }
     }
 
+    /**
+     * Добавление элемента в историю
+     * @param item Добавляемый элемент
+     */
     public synchronized void saveItem(HistoryItemModel item) {
         SQLiteDatabase db = mStorageDbHelper.getWritableDatabase();
         item._id = cupboard().withDatabase(db).put(item);
@@ -132,6 +146,10 @@ public class HistoryStorage {
         mHistory.add(0, item);
     }
 
+    /**
+     * Удаление элемента из истории
+     * @param item Удаляемый элемент
+     */
     public synchronized void removeItem(HistoryItemModel item) {
         SQLiteDatabase db = mStorageDbHelper.getWritableDatabase();
         cupboard().withDatabase(db).delete(item);
@@ -139,16 +157,22 @@ public class HistoryStorage {
         mHistory.remove(item);
     }
 
+    /**
+     * Очистка истории. Избранное при этом не очищается.
+     */
     public synchronized void clearHistory() {
         SQLiteDatabase db = mStorageDbHelper.getWritableDatabase();
+        // Удаляем элементы, которые не находятся в избранном
         cupboard().withDatabase(db).delete(HistoryItemModel.class, "is_favorite = ?", "0");
 
+        // Устанавливаем оставшимся элементам флаг ic_cleared = true
         ContentValues values = new ContentValues(1);
         values.put("ic_cleared", "1");
-        // Update only items with the opposite ic_cleared value
+        // Обновляем только элементы с противоположным значением ic_cleared
         cupboard().withDatabase(db).update(HistoryItemModel.class, values, "ic_cleared = ?", "0");
         db.close();
 
+        // Обновляем данные в оперативной памяти
         Iterator<HistoryItemModel> iterator = mHistory.iterator();
         while (iterator.hasNext()) {
             HistoryItemModel item = iterator.next();
@@ -160,15 +184,21 @@ public class HistoryStorage {
         }
     }
 
+    /**
+     * Очистка избранного. История при этом не очищается.
+     */
     public synchronized void clearFavorites() {
         SQLiteDatabase db = mStorageDbHelper.getWritableDatabase();
         ContentValues values = new ContentValues(1);
         values.put("is_favorite", "0");
-        // Update only items with the opposite is_favorite value
+        // Устанавливаем всем элементам избранного флаг is_favorite = false
+        // Обновляем только элементы с противоположным значением is_favorite
         cupboard().withDatabase(db).update(HistoryItemModel.class, values, "is_favorite = ?", "1");
+        // Удаляем из БД элементы, которые были удалены из истории и не находятся в избранном
         cupboard().withDatabase(db).delete(HistoryItemModel.class, "is_favorite = ? and ic_cleared = ?", "0", "0");
         db.close();
 
+        // Обновляем данные в оперативной памяти
         Iterator<HistoryItemModel> iterator = mHistory.iterator();
         while (iterator.hasNext()) {
             HistoryItemModel item = iterator.next();
@@ -180,6 +210,11 @@ public class HistoryStorage {
         }
     }
 
+    /**
+     * Добавление элемента в избранное или удаление его из избранного
+     * @param item Обрабатываемый элемент
+     * @param favorite Новое состояние элемента
+     */
     public synchronized void setItemFavorite(HistoryItemModel item, boolean favorite) {
         SQLiteDatabase db = mStorageDbHelper.getWritableDatabase();
         ContentValues values = new ContentValues(1);
@@ -189,6 +224,10 @@ public class HistoryStorage {
         item.isFavorite = favorite;
     }
 
+    /**
+     * Сохранение истории в БД
+     * @param history Сохраняемая история
+     */
     public synchronized void save(List<HistoryItemModel> history) {
         SQLiteDatabase db = mStorageDbHelper.getWritableDatabase();
         cupboard().withDatabase(db).delete(HistoryItemModel.class, null);
